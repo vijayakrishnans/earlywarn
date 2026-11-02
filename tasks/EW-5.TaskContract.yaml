@@ -1,0 +1,15 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: EW-5
+  title: "Make the desk encryption key optional at deploy"
+spec:
+  goal: desk-worker deploys whether or not its encryption key has been seeded, and refuses reports until it has.
+  affects:
+    - default/earlywarn/desk-worker
+    - specs/epics/earlywarn-reporting-desk/**
+    - tasks/**
+  doneWhen:
+    - Every desk-worker lane passes on the pull request and on main.
+    - The disclosure routes answer from the new worker on stage.
+  gates: []
