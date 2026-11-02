@@ -285,6 +285,7 @@ export interface NotificationProvider {
  */
 export const NOTIFICATIONS_INTERNAL_ACTOR_HEADER = "x-internal-actor";
 export const NOTIFICATIONS_INTERNAL_ACTOR_VALUES = [
+  "desk-worker",
   "identity-worker",
   "membership-worker",
   "billing-worker",

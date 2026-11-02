@@ -1,0 +1,17 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: EW-9
+  title: "Let desk-worker send email alerts"
+spec:
+  goal: notifications-worker accepts alert emails from desk-worker.
+  affects:
+    - default/earlywarn/contracts
+    - default/earlywarn/notifications-worker
+    - default/earlywarn/notifications-worker-tests
+    - specs/epics/earlywarn-reporting-desk/**
+    - tasks/**
+  doneWhen:
+    - The test alert on stage reports its emails as queued.
+    - A test against the real router accepts desk-worker's exact request.
+  gates: []
