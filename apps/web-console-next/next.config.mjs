@@ -41,7 +41,7 @@ const nextConfig = {
     // M0 / Solo profile (Earlywarn ships single-user). Build with
     // NEXT_PUBLIC_SOLO_MODE=false to restore the full multi-tenant baseline.
     // See specs/profiles/solo-m0.md.
-    NEXT_PUBLIC_SOLO_MODE: process.env.NEXT_PUBLIC_SOLO_MODE ?? "true",
+    NEXT_PUBLIC_SOLO_MODE: process.env.NEXT_PUBLIC_SOLO_MODE ?? "false",
   },
 };
 
