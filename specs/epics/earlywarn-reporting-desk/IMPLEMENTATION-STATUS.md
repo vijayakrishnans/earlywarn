@@ -55,3 +55,7 @@ EW-7 reached stage unable to send email: `notifications-worker` only accepts lis
 ### Front door (EW-10)
 
 The sample case has no product (`prd_sample`), so it cannot turn the readiness checklist green, and the scheduler's query excludes it. There is no separate terms page: the landing page states the limits, and real terms need a lawyer (EW-A).
+
+### Migrations before the worker (EW-11)
+
+On #12's convergence a GitHub OIDC failure stopped `db-migrate`, while `desk-worker`, which had no ordering edge to it, deployed anyway. Opening a case answered 500 until the failed lanes were re-run. `desk-worker` now waits for `db-migrate`.
