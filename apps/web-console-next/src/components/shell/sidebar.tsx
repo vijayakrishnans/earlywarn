@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import {
   CheckCircle2,
+  Timer,
   Inbox,
   Package,
   BellRing,
@@ -40,6 +41,7 @@ import { SidebarFind } from "./sidebar-find";
 
 const ICONS: Record<string, LucideIcon> = {
   CheckCircle2,
+  Timer,
   Inbox,
   Package,
   BellRing,

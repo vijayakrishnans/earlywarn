@@ -69,6 +69,7 @@ export function buildNavSections(scope: NavScope, soloMode: boolean = SOLO_MODE)
           ]
         : [
             { href: `${orgBase}/desk`, label: "Readiness", icon: "CheckCircle2" },
+            { href: `${orgBase}/desk/cases`, label: "Cases", icon: "Timer" },
             { href: `${orgBase}/desk/reports`, label: "Triage", icon: "Inbox" },
             { href: `${orgBase}/desk/products`, label: "Products", icon: "Package" },
             { href: `${orgBase}/desk/escalation`, label: "Escalation", icon: "BellRing" },

@@ -13,3 +13,8 @@ export const reportPublicId = (uuid: string): string => `rpt_${uuidToHex(uuid)}`
 export function parseReportId(id: string): string | null {
   return id.startsWith("rpt_") ? hexToUuid(id.slice(4)) : null;
 }
+export const casePublicId = (uuid: string): string => `cas_${uuidToHex(uuid)}`;
+
+export function parseCaseId(id: string): string | null {
+  return id.startsWith("cas_") ? hexToUuid(id.slice(4)) : null;
+}

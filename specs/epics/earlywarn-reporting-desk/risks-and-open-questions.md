@@ -37,3 +37,11 @@ The duty falls on manufacturers of products with digital elements; pure SaaS is 
 ## EW-I — Demand is unvalidated (ACCEPTED, for now)
 
 The strongest public data is ENISA's survey: 194 self-selected responses, not representative, showing weak incident response and only 13% with good understanding of documentation requirements. No customer has been interviewed. Building a first release before interviews is a deliberate, low-cost choice; charging before them is not.
+
+## EW-J — What the hash chain can and cannot prove (ACCEPTED, for now)
+
+The chain shows that an exported timeline has not been edited or reordered, and the case page flags a broken chain. It cannot show that the newest events were not deleted, and someone with database access could rebuild the whole chain. Rows are append-only by code path, not by database trigger: the migration runner splits files on every top-level semicolon and cannot apply a trigger body. Anchoring the head hash somewhere outside this database, such as in each email or webhook alert, would close most of the gap, and EW5's export carries the head hash so a customer's saved copy can serve that role.
+
+## EW-K — Case titles and notes are stored in clear (RISK, mitigated)
+
+Report contents are sealed, but case titles and timeline notes are not, because they must stay readable by the scheduler and form part of the hash. The console tells people to keep titles free of exploit detail. Sealing notes while hashing their ciphertext is a sensible follow-up before prod holds real cases.

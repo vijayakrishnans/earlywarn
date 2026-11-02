@@ -1,0 +1,25 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: EW-6
+  title: "Cases and clocks: recorded awareness, deadlines, hash-chained timeline"
+spec:
+  goal: A named person can open a case with a recorded time of awareness, and its deadlines and tamper-evident timeline follow from that.
+  affects:
+    - default/earlywarn/contracts
+    - default/earlywarn/db
+    - default/earlywarn/db-migrate
+    - default/earlywarn/db-tests
+    - default/earlywarn/desk-worker
+    - default/earlywarn/desk-worker-tests
+    - default/earlywarn/sdk
+    - default/earlywarn/web-console-next
+    - default/earlywarn/web-console-next-tests
+    - specs/epics/earlywarn-reporting-desk/**
+    - tasks/**
+  doneWhen:
+    - The deadline table is covered by tests for both kinds, including a late corrective measure and a backdated awareness.
+    - Concurrent appends produce one winner per position and no fork, by test.
+    - Changing any stored event fails chain verification, by test.
+    - A case can be opened on stage.
+  gates: []
