@@ -45,6 +45,10 @@ spec:
   secretEnv:
     WIRING_CLOUDFLARE_D1_STAGE: "secret://ws_HTQG7F27/earlywarn/stage/WIRING_CLOUDFLARE_D1"
     WIRING_CLOUDFLARE_D1_PROD: "secret://ws_HTQG7F27/earlywarn/prod/WIRING_CLOUDFLARE_D1"
+
+  # Optional so a deploy does not depend on it: until it is seeded, the worker
+  # refuses reports with a 503 rather than storing them unsealed.
+  optionalSecretEnv:
     DESK_ENCRYPTION_KEY: "secret://ws_HTQG7F27/earlywarn/{{ .environment }}/DESK_ENCRYPTION_KEY"
 
   subscribe:
