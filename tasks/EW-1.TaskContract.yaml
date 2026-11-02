@@ -1,0 +1,14 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: EW-1
+  title: "The Earlywarn epic doc set"
+spec:
+  goal: The Earlywarn epic doc set is reviewed and on main as the design of record.
+  affects:
+    - specs/epics/earlywarn-reporting-desk/**
+    - tasks/**
+  doneWhen:
+    - The five epic documents are on main.
+    - task_get earlywarn-reporting-desk shows the epic with milestones EW0 to EW6.
+  gates: []
