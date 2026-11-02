@@ -97,6 +97,11 @@ export class DeskClient {
     return this.transport.request({ method: "POST", path: this.path(orgId, "cases"), body }, opts);
   }
 
+  /** Opens the organization's practice case, or returns the one already open. */
+  openSampleCase(orgId: string, opts: RequestOptions = {}): Promise<DeskCaseResponse> {
+    return this.transport.request({ method: "POST", path: this.path(orgId, "cases/sample"), body: {} }, opts);
+  }
+
   getCase(orgId: string, id: string, opts: RequestOptions = {}): Promise<DeskCaseDetailResponse> {
     return this.transport.request({ method: "GET", path: this.casePath(orgId, id) }, opts);
   }

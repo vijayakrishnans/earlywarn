@@ -19,7 +19,7 @@ function makeCase(overrides: Partial<DeskCase> = {}): DeskCase {
     id: "c", orgId: "o", reportId: null, productId: "p", kind: "vulnerability", title: "T", status: "open",
     awareAt: T0, awareRecordedBy: "u", correctiveAvailableAt: null, notificationSubmittedAt: null,
     earlyWarningDueAt: new Date(at(24 * 60)).toISOString(), notificationDueAt: new Date(at(72 * 60)).toISOString(),
-    finalDueAt: null, acknowledgedAt: null, acknowledgedBy: null, createdAt: T0, updatedAt: T0, ...overrides,
+    finalDueAt: null, acknowledgedAt: null, acknowledgedBy: null, isSample: false, createdAt: T0, updatedAt: T0, ...overrides,
   };
 }
 const keys = (c: DeskCase, sent: string[], minutes: number, submitted: ReportingStage[] = []) =>

@@ -1,0 +1,24 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: EW-10
+  title: "The front door: landing page, practice case and product docs"
+spec:
+  goal: A visitor learns what Earlywarn does and does not do, and a new team can try the whole flow safely.
+  affects:
+    - default/earlywarn/contracts
+    - default/earlywarn/db
+    - default/earlywarn/db-migrate
+    - default/earlywarn/db-tests
+    - default/earlywarn/desk-worker
+    - default/earlywarn/desk-worker-tests
+    - default/earlywarn/sdk
+    - default/earlywarn/web-console-next
+    - README.md
+    - specs/epics/earlywarn-reporting-desk/**
+    - tasks/**
+  doneWhen:
+    - The landing page states plainly that Earlywarn does not file on the customer's behalf.
+    - The practice case cannot alert anyone or be mistaken for a real case, by test.
+    - A fresh sign-up reaches a published disclosure page in under ten minutes.
+  gates: []

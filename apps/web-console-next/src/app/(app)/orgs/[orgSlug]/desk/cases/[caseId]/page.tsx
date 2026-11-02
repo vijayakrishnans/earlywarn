@@ -119,6 +119,12 @@ function Inner({ orgId, orgSlug, caseId }: { orgId: string; orgSlug: string; cas
         </div>
       </div>
 
+      {c.isSample ? (
+        <p className="rounded-md border border-dashed p-3 text-sm">
+          This is a practice case. It is not a real record and it alerts nobody. Nothing here goes to ENISA.
+        </p>
+      ) : null}
+
       <div className="grid gap-4 sm:grid-cols-3">
         {clocks.map(({ label, due }) => (
           <Card key={label}>

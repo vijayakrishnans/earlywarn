@@ -228,5 +228,14 @@ export const manifest: MigrationManifest = {
       description:
         "Records of stages filed in ENISA's Single Reporting Platform",
     },
+    {
+      id: "250_desk_sample_cases",
+      context: "desk",
+      path: "250_desk_sample_cases/up.sql",
+      checksum:
+        "1e29b7ea9e97ef07166cf8bb5a3adacf2d1edd5e18150e89756887bdd3d3d191",
+      description:
+        "Practice cases that are visibly not real and never alerted on",
+    },
   ],
 };

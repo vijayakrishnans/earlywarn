@@ -34,9 +34,10 @@ function toCase(c: DeskCase): PublicDeskCase {
     finalDueAt: c.finalDueAt,
     acknowledgedAt: c.acknowledgedAt,
     acknowledgedBy: c.acknowledgedBy,
+    isSample: c.isSample,
     createdAt: c.createdAt,
     id: casePublicId(c.id),
-    productId: productPublicId(c.productId),
+    productId: c.isSample ? "prd_sample" : productPublicId(c.productId),
     reportId: c.reportId ? reportPublicId(c.reportId) : null,
   };
 }
@@ -160,6 +161,7 @@ async function createCase(
     notificationSubmittedAt: null,
     acknowledgedAt: null,
     acknowledgedBy: null,
+    isSample: false,
     createdAt: stamp,
     updatedAt: stamp,
     ...computeDeadlines({ kind, awareAt: awareAt!, correctiveAvailableAt: null, notificationSubmittedAt: null }),
@@ -179,6 +181,41 @@ async function createCase(
   return ok({ case: toCase(record) }, requestId, 201);
 }
 
+const SAMPLE_PRODUCT_ID = "sample";
+
+/** A practice case for trying the desk. It has no product and the scheduler never reads it. */
+async function openSampleCase(repo: DeskRepository, orgId: string, actor: string, requestId: string): Promise<Response> {
+  const existing = await repo.findOpenSample(orgId);
+  if (existing) return ok({ case: toCase(existing) }, requestId);
+  const now = new Date();
+  const stamp = now.toISOString();
+  const awareAt = new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString();
+  const id = crypto.randomUUID();
+  const title = "[Sample] Practice case: not real, alerts nobody";
+  const record: DeskCase = {
+    id,
+    orgId,
+    reportId: null,
+    productId: SAMPLE_PRODUCT_ID,
+    kind: "vulnerability",
+    title,
+    status: "open",
+    awareAt,
+    awareRecordedBy: actor,
+    correctiveAvailableAt: null,
+    notificationSubmittedAt: null,
+    acknowledgedAt: null,
+    acknowledgedBy: null,
+    isSample: true,
+    createdAt: stamp,
+    updatedAt: stamp,
+    ...computeDeadlines({ kind: "vulnerability", awareAt, correctiveAvailableAt: null, notificationSubmittedAt: null }),
+  };
+  const first = await buildEvent(id, orgId, 1, GENESIS_HASH, "case.opened", actor, { sample: true, title, awareAt }, stamp);
+  await repo.insertCase(record, first);
+  return ok({ case: toCase(record) }, requestId, 201);
+}
+
 export async function handleCaseRoute(
   request: Request,
   repo: DeskRepository,
@@ -194,6 +231,11 @@ export async function handleCaseRoute(
     if (method === "GET") return ok({ cases: (await repo.listCases(orgId)).map(toCase) }, requestId);
     if (method === "POST") return createCase(repo, orgId, actor, body, requestId);
     return fail("unsupported", "Method not allowed", 405, requestId);
+  }
+
+  if (path === "cases/sample") {
+    if (method !== "POST") return fail("unsupported", "Method not allowed", 405, requestId);
+    return openSampleCase(repo, orgId, actor, requestId);
   }
 
   const [, rawId, action] = path.split("/");
