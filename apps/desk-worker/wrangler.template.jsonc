@@ -8,6 +8,9 @@
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/index.ts",
   "minify": false,
+  "triggers": {
+    "crons": ["* * * * *"]
+  },
   "vars": {
     "ENVIRONMENT": "local"
   },
@@ -20,7 +23,8 @@
     "stage": {
       "workers_dev": false,
       "vars": {
-        "ENVIRONMENT": "stage"
+        "ENVIRONMENT": "stage",
+        "CONSOLE_URL": "https://earlywarn-web-console-next-stage.vijayakrishnan12994.workers.dev"
       },
       "d1_databases": [
         {
@@ -37,13 +41,18 @@
         {
           "binding": "POLICY_WORKER",
           "service": "earlywarn-policy-worker-stage"
+        },
+        {
+          "binding": "NOTIFICATIONS_WORKER",
+          "service": "earlywarn-notifications-worker-stage"
         }
       ]
     },
     "prod": {
       "workers_dev": false,
       "vars": {
-        "ENVIRONMENT": "prod"
+        "ENVIRONMENT": "prod",
+        "CONSOLE_URL": "https://earlywarn-web-console-next-prod.vijayakrishnan12994.workers.dev"
       },
       "d1_databases": [
         {
@@ -60,6 +69,10 @@
         {
           "binding": "POLICY_WORKER",
           "service": "earlywarn-policy-worker-prod"
+        },
+        {
+          "binding": "NOTIFICATIONS_WORKER",
+          "service": "earlywarn-notifications-worker-prod"
         }
       ]
     }

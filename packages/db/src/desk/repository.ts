@@ -404,6 +404,61 @@ export function createDeskRepository(executor: SqlExecutor) {
       }
     },
 
+    /** Scheduler only: every open case on the platform, soonest deadline first. */
+    async listOpenCasesForScheduler(limit: number): Promise<DeskCase[]> {
+      const { rows } = await executor.execute<Row>(
+        `SELECT * FROM desk_cases WHERE status = 'open' ORDER BY notification_due_at, id LIMIT $1`,
+        [limit],
+      );
+      return rows.map(mapCase);
+    },
+
+    /** Scheduler only: new reports that still owe an alert, with their organization's triage target. */
+    async listNewReportsForScheduler(limit: number): Promise<Array<{
+      id: string;
+      orgId: string;
+      receivedAt: string;
+      triageTargetMinutes: number;
+    }>> {
+      const { rows } = await executor.execute<Row>(
+        `SELECT r.id, r.org_id, r.received_at, COALESCE(s.triage_target_minutes, 240) AS target
+           FROM desk_reports r
+           LEFT JOIN desk_settings s ON s.org_id = r.org_id
+          WHERE r.status = 'new'
+            AND NOT EXISTS (SELECT 1 FROM desk_alerts a WHERE a.subject_id = r.id AND a.alert_key = 'triage-late')
+          ORDER BY r.received_at LIMIT $1`,
+        [limit],
+      );
+      return rows.map((row) => ({
+        id: String(row.id),
+        orgId: String(row.org_id),
+        receivedAt: String(row.received_at),
+        triageTargetMinutes: Number(row.target),
+      }));
+    },
+
+    async listSentAlerts(subjectId: string): Promise<string[]> {
+      const { rows } = await executor.execute<Row>(`SELECT alert_key FROM desk_alerts WHERE subject_id = $1`, [subjectId]);
+      return rows.map((row) => String(row.alert_key));
+    },
+
+    /** True when this call recorded it; false when an earlier run already had. */
+    async recordAlert(
+      orgId: string,
+      kind: "case" | "report",
+      subjectId: string,
+      key: string,
+      now: string,
+    ): Promise<boolean> {
+      const { rowCount } = await executor.execute(
+        `INSERT INTO desk_alerts (id, org_id, subject_kind, subject_id, alert_key, sent_at)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         ON CONFLICT (subject_id, alert_key) DO NOTHING RETURNING id`,
+        [crypto.randomUUID(), orgId, kind, subjectId, key, now],
+      );
+      return rowCount > 0;
+    },
+
     /** The one read of settings by public address; only a published page answers. */
     async getDisclosure(slug: string): Promise<DeskDisclosure | null> {
       const { rows } = await executor.execute<Row>(

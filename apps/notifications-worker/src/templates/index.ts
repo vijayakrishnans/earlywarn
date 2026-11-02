@@ -169,8 +169,31 @@ const renderInvitationAccepted: TemplateRenderer = (data, opts) => {
   return { subject, html, text };
 };
 
+
+/**
+ * Reporting desk alerts. These carry a title, a reason and a link: never report
+ * contents, which stay sealed behind a sign-in.
+ */
+function renderDeskAlert(data: TemplateData, opts: TemplateRenderOptions): RenderedEmail {
+  const brand = opts.brandName ?? "Your reporting desk";
+  const headline = str(data, "headline");
+  const title = str(data, "title");
+  const detail = str(data, "detail");
+  const url = str(data, "url");
+  const chainHead = str(data, "chainHead");
+  const anchor = chainHead ? `Timeline fingerprint at this alert: ${chainHead}` : "";
+  return {
+    subject: `[${brand}] ${headline}: ${title}`,
+    text: [headline, title, detail, url ? `Open: ${url}` : "", anchor].filter(Boolean).join("\n\n"),
+    html: `<p><strong>${escapeHtml(headline)}</strong></p><p>${escapeHtml(title)}</p><p>${escapeHtml(detail)}</p>${
+      url ? `<p><a href="${escapeHtml(url)}">Open in ${escapeHtml(brand)}</a></p>` : ""
+    }${anchor ? `<p style="color:#666;font-size:12px">${escapeHtml(anchor)}</p>` : ""}`,
+  };
+}
+
 const TEMPLATES: Record<string, TemplateRenderer> = {
   "auth.magic_link": renderMagicLink,
+  "desk.alert": renderDeskAlert,
   "invitation.created": renderInvitationCreated,
   "invitation.accepted": renderInvitationAccepted,
 };

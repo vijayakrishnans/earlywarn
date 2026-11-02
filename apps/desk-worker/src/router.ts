@@ -7,6 +7,7 @@ import { fail, invalid, notFound, ok } from "./http.js";
 import { handlePublicRoute, isPublicPath } from "./public.js";
 import { handleReportRoute } from "./reports.js";
 import { handleCaseRoute } from "./cases.js";
+import { sendTestAlert } from "./escalation.js";
 import { orgPublicId, parseOrgId, parseProductId, productPublicId, stepPublicId } from "./ids.js";
 import { fetchAuthorizationContext } from "./membership-client.js";
 import { authorizeViaPolicy } from "./policy-client.js";
@@ -151,6 +152,11 @@ async function handleOrgRoute(
     const saved = await repo.saveSettings(next, now);
     if (!saved.ok) return fail("conflict", "That public address is already taken", 409, requestId);
     return ok({ settings: toSettings(saved.settings) }, requestId);
+  }
+
+  if (path === "escalation/test") {
+    if (method !== "POST") return fail("unsupported", "Method not allowed", 405, requestId);
+    return ok(await sendTestAlert(env, repo, createEventsRepository(executor), orgId, requestId), requestId);
   }
 
   if (path === "escalation") {

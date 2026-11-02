@@ -31,7 +31,7 @@ Disclosure page, public report route with encryption at rest and KV rate limitin
 - `security.txt` validates against RFC 9116's required fields
 - the rate limit answers `rate_limited`, by test
 
-## EW3 — cases and clocks
+## EW3 — cases and clocks ✅
 
 Cases, recorded awareness, computed deadlines, hash-chained timeline, case page.
 

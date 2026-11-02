@@ -210,5 +210,14 @@ export const manifest: MigrationManifest = {
       description:
         "Reporting cases, deadlines and a hash-chained timeline",
     },
+    {
+      id: "230_desk_alerts",
+      context: "desk",
+      path: "230_desk_alerts/up.sql",
+      checksum:
+        "24ffc30c4d5874ccd6d41c653236f14375c70f0edfffce73c7610b2c4b1c8377",
+      description:
+        "Escalation alerts already delivered, keeping the scheduler idempotent",
+    },
   ],
 };

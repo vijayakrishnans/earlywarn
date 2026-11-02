@@ -7,8 +7,8 @@ As-built ≠ intent. This file records what actually shipped, and every place th
 | EW0 — the spec | ✅ | #3 |
 | EW1 — the register | ✅ on stage (#4, #5); prod sign-in still blocked | #5 |
 | EW2 — public intake | Code merged (#6, deploy fixed in EW-5); needs `DESK_ENCRYPTION_KEY` seeded | #6 |
-| EW3 — cases and clocks | Merged when this PR lands; verify on stage | this PR |
-| EW4 — escalation | | |
+| EW3 — cases and clocks | ✅ | #8 |
+| EW4 — escalation | Webhook path provable on stage; email needs a domain; prod needs sign-in | this PR |
 | EW5 — the SRP packet | | |
 | EW6 — the front door | | |
 
@@ -37,3 +37,7 @@ EW-4 listed `DESK_ENCRYPTION_KEY` under `secretEnv`, so every `desk-worker` lane
 ### Cases as built (EW-6)
 
 Case status is `open` or `closed`; which reports have been filed is tracked by submissions in EW5 rather than by further statuses. A case is opened from a report with `reportId` on `POST /desk/cases` rather than a route under the report. Actions are `/notes`, `/awareness`, `/corrective-measure`, `/acknowledge` and `/close`. See EW-J for the limits of the chain and EW-K for what is stored in clear.
+
+### Escalation as built (EW-7)
+
+The chain starts when a case is opened, not at a backdated awareness, so a late-opened case does not page everyone at once. Deadline reminders send only the latest threshold passed. Each alert is recorded after delivery, not before: a crash may retry, and the notification key and deterministic event id collapse the duplicate, whereas claiming first could lose an alert. Every alert writes an event, so a `webhook` channel on a step restricts nothing: selecting only `webhook` means that step gets no email. Webhook payloads carry the timeline's head hash, a partial answer to EW-J. Scheduled work reads across organizations by design, in two named scheduler queries.
