@@ -6,20 +6,20 @@ metadata:
 spec:
   goal: A workspace can register its products, name its CSIRT, set its escalation chain and see a readiness checklist.
   affects:
-    - api-edge
-    - contracts
-    - db
-    - db-migrate
-    - db-tests
-    - desk-worker
-    - desk-worker-tests
-    - policy-engine
-    - policy-worker
-    - policy-engine-tests
-    - sdk
-    - web-console-next
-    - web-console-next-tests
-    - api-edge-tests
+    - default/earlywarn/api-edge
+    - default/earlywarn/contracts
+    - default/earlywarn/db
+    - default/earlywarn/db-migrate
+    - default/earlywarn/db-tests
+    - default/earlywarn/desk-worker
+    - default/earlywarn/desk-worker-tests
+    - default/earlywarn/policy-engine
+    - default/earlywarn/policy-worker
+    - default/earlywarn/policy-engine-tests
+    - default/earlywarn/sdk
+    - default/earlywarn/web-console-next
+    - default/earlywarn/web-console-next-tests
+    - default/earlywarn/api-edge-tests
     - specs/epics/earlywarn-reporting-desk/**
     - tasks/**
     - pnpm-lock.yaml
