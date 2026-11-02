@@ -9,7 +9,7 @@ As-built ≠ intent. This file records what actually shipped, and every place th
 | EW2 — public intake | Code merged (#6, deploy fixed in EW-5); needs `DESK_ENCRYPTION_KEY` seeded | #6 |
 | EW3 — cases and clocks | ✅ | #8 |
 | EW4 — escalation | Webhook path provable on stage; email needs a domain; prod needs sign-in | this PR |
-| EW5 — the SRP packet | | |
+| EW5 — the SRP packet | Merged when this PR lands; field mapping not checked against the portal (EW-G) | this PR |
 | EW6 — the front door | | |
 
 ## Departures from the design
@@ -41,3 +41,7 @@ Case status is `open` or `closed`; which reports have been filed is tracked by s
 ### Escalation as built (EW-7)
 
 The chain starts when a case is opened, not at a backdated awareness, so a late-opened case does not page everyone at once. Deadline reminders send only the latest threshold passed. Each alert is recorded after delivery, not before: a crash may retry, and the notification key and deterministic event id collapse the duplicate, whereas claiming first could lose an alert. Every alert writes an event, so a `webhook` channel on a step restricts nothing: selecting only `webhook` means that step gets no email. Webhook payloads carry the timeline's head hash, a partial answer to EW-J. Scheduled work reads across organizations by design, in two named scheduler queries.
+
+### The report packet (EW-8)
+
+`srp_reference` is optional: ENISA's submission guidance describes a dashboard entry and a confirmation email but mentions no reference number. Stage order follows that guidance's preconditions. Case state does not change on each filing: `desk_submissions` holds it, and the case's `notification_submitted_at` starts an incident's final clock.

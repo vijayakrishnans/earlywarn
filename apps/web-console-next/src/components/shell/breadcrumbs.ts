@@ -20,6 +20,7 @@ export interface Crumb {
 const SEGMENT_LABELS: Record<string, string> = {
   desk: "Readiness",
   cases: "Cases",
+  packet: "Reports to file",
   reports: "Triage",
   products: "Products",
   escalation: "Escalation",

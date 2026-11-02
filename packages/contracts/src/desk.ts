@@ -157,3 +157,40 @@ export interface DeskCaseDetailResponse {
   events: PublicDeskCaseEvent[];
   chainValid: boolean;
 }
+
+export interface PacketField {
+  id: string;
+  label: string;
+  requirement: "required" | "optional";
+  note: string | null;
+  /** Filled from what Earlywarn already knows; a person checks it before entering it. */
+  value: string | null;
+  missing: boolean;
+}
+
+export interface DeskPacket {
+  stage: "early_warning" | "notification" | "final";
+  catalogVersion: string;
+  dueAt: string | null;
+  submitted: PublicDeskSubmission | null;
+  /** The earlier stage that must be recorded first, if any. */
+  blockedBy: "early_warning" | "notification" | null;
+  fields: PacketField[];
+}
+
+export interface PublicDeskSubmission {
+  stage: "early_warning" | "notification" | "final";
+  fields: Record<string, string>;
+  srpReference: string | null;
+  submittedAt: string;
+  submittedBy: string;
+}
+
+export interface RecordSubmissionRequest {
+  stage: "early_warning" | "notification" | "final";
+  fields: Record<string, string>;
+  submittedAt: string;
+  srpReference?: string | null;
+}
+
+export interface DeskPacketResponse { packet: DeskPacket }

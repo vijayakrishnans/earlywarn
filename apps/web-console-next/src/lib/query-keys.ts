@@ -14,6 +14,7 @@ export const qk = {
   deskReports: (orgId: string) => ["deskReports", orgId] as const,
   deskCases: (orgId: string) => ["deskCases", orgId] as const,
   deskCase: (orgId: string, caseId: string) => ["deskCase", orgId, caseId] as const,
+  deskPacket: (orgId: string, caseId: string, stage: string) => ["deskPacket", orgId, caseId, stage] as const,
   deskProducts: (orgId: string) => ["deskProducts", orgId] as const,
   deskEscalation: (orgId: string) => ["deskEscalation", orgId] as const,
   projects: (orgId: string) => ["projects", orgId] as const,

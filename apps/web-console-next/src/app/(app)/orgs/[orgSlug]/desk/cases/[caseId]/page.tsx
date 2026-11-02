@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { OrgScope } from "@/components/shell/org-scope";
@@ -18,7 +19,9 @@ import { useSession } from "@/lib/session";
 export default function DeskCasePage() {
   const params = useParams<{ orgSlug: string; caseId: string }>();
   return (
-    <OrgScope slug={params?.orgSlug ?? ""}>{(org) => <Inner orgId={org.id} caseId={params?.caseId ?? ""} />}</OrgScope>
+    <OrgScope slug={params?.orgSlug ?? ""}>
+      {(org) => <Inner orgId={org.id} orgSlug={org.slug} caseId={params?.caseId ?? ""} />}
+    </OrgScope>
   );
 }
 
@@ -32,7 +35,7 @@ function left(dueAt: string | null, now: number): string {
   return ms < 0 ? `${span} overdue` : `${span} left`;
 }
 
-function Inner({ orgId, caseId }: { orgId: string; caseId: string }) {
+function Inner({ orgId, orgSlug, caseId }: { orgId: string; orgSlug: string; caseId: string }) {
   const { client } = useSession();
   const { toast } = useToast();
   const qc = useQueryClient();
@@ -68,6 +71,21 @@ function Inner({ orgId, caseId }: { orgId: string; caseId: string }) {
   if (!detail.data) return null;
   const { case: c, events, chainValid } = detail.data;
   const open = c.status === "open";
+  const downloadEvidence = async () => {
+    setBusy(true);
+    const result = await wrap(() => client.desk.exportEvidence(orgId, caseId));
+    setBusy(false);
+    if (!result.ok) {
+      toast({ kind: "error", title: "Could not export", description: result.error.message });
+      return;
+    }
+    const url = URL.createObjectURL(new Blob([JSON.stringify(result.data, null, 2)], { type: "application/json" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `earlywarn-evidence-${caseId}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
   const clocks = [
     { label: "Early warning", due: c.earlyWarningDueAt },
     { label: "Notification", due: c.notificationDueAt },
@@ -85,6 +103,12 @@ function Inner({ orgId, caseId }: { orgId: string; caseId: string }) {
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="secondary">{c.status}</Badge>
+          <Button variant="outline" asChild>
+            <Link href={`/orgs/${orgSlug}/desk/cases/${caseId}/packet`}>Reports to file</Link>
+          </Button>
+          <Button variant="outline" disabled={busy} onClick={() => void downloadEvidence()}>
+            Export evidence
+          </Button>
           {c.acknowledgedAt ? (
             <Badge variant="outline">Acknowledged</Badge>
           ) : (

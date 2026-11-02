@@ -1,0 +1,25 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: EW-8
+  title: "The SRP packet: stage fields, filing records and an evidence export"
+spec:
+  goal: A person can prepare each stage's report, record that they filed it, and export evidence that verifies offline.
+  affects:
+    - default/earlywarn/contracts
+    - default/earlywarn/db
+    - default/earlywarn/db-migrate
+    - default/earlywarn/db-tests
+    - default/earlywarn/desk-worker
+    - default/earlywarn/desk-worker-tests
+    - default/earlywarn/sdk
+    - default/earlywarn/web-console-next
+    - tooling/desk/**
+    - specs/epics/earlywarn-reporting-desk/**
+    - tasks/**
+  doneWhen:
+    - Catalogue tests cover the glossary's required fields for each stage and case kind.
+    - A sample case of each kind is walked through all three stages on stage.
+    - Recording a stage out of order answers stage_out_of_order.
+    - The exported JSON verifies with the documented script, without an account, and fails after any edit.
+  gates: []
