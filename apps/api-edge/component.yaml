@@ -39,6 +39,7 @@ spec:
           when:
             triggerRef: github-pull-request
     - component: projects-worker
+    - component: desk-worker
     - component: events-worker
     - component: config-worker
     - component: webhooks-worker

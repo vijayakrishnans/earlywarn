@@ -3,6 +3,7 @@ export { isUuid, asUuid, uuidFromPublicId } from "./ids/index.js";
 export type { Uuid } from "./ids/index.js";
 
 export const BOUNDED_CONTEXTS = [
+  "desk",
   "control",
   "identity",
   "membership",

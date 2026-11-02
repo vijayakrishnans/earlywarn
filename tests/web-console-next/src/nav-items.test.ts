@@ -79,6 +79,9 @@ describe("buildNavSections under the Solo (M0) profile", () => {
     const org = buildNavSections({ orgSlug: "acme" }, false).find((s) => s.id === "org")!;
     expect(org.label).toBe("Org · acme");
     expect(org.links.map((l) => l.href)).toEqual([
+      "/orgs/acme/desk",
+      "/orgs/acme/desk/products",
+      "/orgs/acme/desk/escalation",
       "/orgs/acme/projects",
       "/orgs/acme/usage",
       "/orgs/acme/settings",

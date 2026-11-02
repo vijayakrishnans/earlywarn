@@ -21,3 +21,7 @@ The design assumed teams and webhooks were on. The baseline ships with `SOLO_MOD
 ### Sign-in has no production path yet (open)
 
 The baseline's stage returns sign-in codes in the API response (`DEBUG_DELIVERY=true`). Prod sends them by email, which needs a verified domain, and no OAuth provider is configured. Until one of those exists nobody can sign in on prod.
+
+### Register routes and the chain (EW-3)
+
+Authenticated routes live under `/desk/` (`/desk/products`, `/desk/settings`, `/desk/escalation`, `/desk/readiness`) rather than directly under the organization, so they cannot collide with baseline routes. Escalation steps store a name and an email rather than a `user_id`: the baseline's member list carries no email address, and a backup need not hold a console login to be alerted. Readiness combines representatives with the chain, whose first two steps are the primary and the backup.

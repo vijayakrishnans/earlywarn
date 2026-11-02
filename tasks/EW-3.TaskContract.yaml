@@ -1,0 +1,45 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: EW-3
+  title: "The register: desk worker, products, settings, escalation chain, readiness"
+spec:
+  goal: A workspace can register its products, name its CSIRT, set its escalation chain and see a readiness checklist.
+  affects:
+    - apps/desk-worker/**
+    - apps/api-edge/**
+    - apps/policy-worker/component.yaml
+    - apps/web-console-next/**
+    - packages/contracts/**
+    - packages/db/**
+    - packages/policy-engine/**
+    - packages/sdk/**
+    - tests/desk-worker/**
+    - tests/db/**
+    - tests/policy-engine/**
+    - tests/web-console-next/**
+    - tests/api-edge/**
+    - pnpm-lock.yaml
+    - .gitignore
+    - specs/epics/earlywarn-reporting-desk/**
+    - tasks/**
+    - api-edge
+    - contracts
+    - db
+    - db-migrate
+    - db-tests
+    - desk-worker
+    - desk-worker-tests
+    - policy-engine
+    - policy-worker
+    - sdk
+    - web-console-next
+    - web-console-next-tests
+    - api-edge-tests
+    - policy-engine-tests
+  doneWhen:
+    - desk-worker answers through the edge on stage and prod.
+    - Migration 200 is applied on stage and prod.
+    - A member of another organization gets not_found on these routes, by test.
+    - A new organization turns its readiness checklist green on stage.
+  gates: []
