@@ -1,4 +1,8 @@
 import type {
+  CreateDeskCaseRequest,
+  DeskCaseDetailResponse,
+  DeskCaseResponse,
+  ListDeskCasesResponse,
   DeskProductInput,
   DeskReportResponse,
   DeskReportStatus,
@@ -77,5 +81,44 @@ export class DeskClient {
       { method: "PATCH", path: this.path(orgId, `reports/${encodeURIComponent(id)}`), body: { status } },
       opts,
     );
+  }
+
+  listCases(orgId: string, opts: RequestOptions = {}): Promise<ListDeskCasesResponse> {
+    return this.transport.request({ method: "GET", path: this.path(orgId, "cases") }, opts);
+  }
+
+  createCase(orgId: string, body: CreateDeskCaseRequest, opts: RequestOptions = {}): Promise<DeskCaseResponse> {
+    return this.transport.request({ method: "POST", path: this.path(orgId, "cases"), body }, opts);
+  }
+
+  getCase(orgId: string, id: string, opts: RequestOptions = {}): Promise<DeskCaseDetailResponse> {
+    return this.transport.request({ method: "GET", path: this.casePath(orgId, id) }, opts);
+  }
+
+  acknowledgeCase(orgId: string, id: string, opts: RequestOptions = {}): Promise<DeskCaseResponse> {
+    return this.transport.request({ method: "POST", path: `${this.casePath(orgId, id)}/acknowledge`, body: {} }, opts);
+  }
+
+  addCaseNote(orgId: string, id: string, note: string, opts: RequestOptions = {}): Promise<DeskCaseResponse> {
+    return this.transport.request({ method: "POST", path: `${this.casePath(orgId, id)}/notes`, body: { note } }, opts);
+  }
+
+  correctAwareness(orgId: string, id: string, awareAt: string, reason: string, opts: RequestOptions = {}): Promise<DeskCaseResponse> {
+    return this.transport.request({ method: "PUT", path: `${this.casePath(orgId, id)}/awareness`, body: { awareAt, reason } }, opts);
+  }
+
+  recordCorrectiveMeasure(orgId: string, id: string, availableAt: string, description: string, opts: RequestOptions = {}): Promise<DeskCaseResponse> {
+    return this.transport.request(
+      { method: "PUT", path: `${this.casePath(orgId, id)}/corrective-measure`, body: { availableAt, description } },
+      opts,
+    );
+  }
+
+  closeCase(orgId: string, id: string, reason: string, opts: RequestOptions = {}): Promise<DeskCaseResponse> {
+    return this.transport.request({ method: "POST", path: `${this.casePath(orgId, id)}/close`, body: { reason } }, opts);
+  }
+
+  private casePath(orgId: string, id: string): string {
+    return this.path(orgId, `cases/${encodeURIComponent(id)}`);
   }
 }

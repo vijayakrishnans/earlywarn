@@ -201,5 +201,14 @@ export const manifest: MigrationManifest = {
       description:
         "Reports received through the public disclosure page, sealed at rest",
     },
+    {
+      id: "220_desk_cases",
+      context: "desk",
+      path: "220_desk_cases/up.sql",
+      checksum:
+        "1e7bce8474f17f0560d33b65ab9fb5308f33bd7c9176c761f51ce3c03821278d",
+      description:
+        "Reporting cases, deadlines and a hash-chained timeline",
+    },
   ],
 };

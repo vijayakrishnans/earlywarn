@@ -137,6 +137,101 @@ function mapReport(row: Row): DeskReportRow {
   };
 }
 
+export type DeskCaseKind = "vulnerability" | "incident";
+
+export interface DeskCase {
+  id: string;
+  orgId: string;
+  reportId: string | null;
+  productId: string;
+  kind: DeskCaseKind;
+  title: string;
+  status: "open" | "closed";
+  awareAt: string;
+  awareRecordedBy: string;
+  correctiveAvailableAt: string | null;
+  notificationSubmittedAt: string | null;
+  earlyWarningDueAt: string;
+  notificationDueAt: string;
+  finalDueAt: string | null;
+  acknowledgedAt: string | null;
+  acknowledgedBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DeskCaseEvent {
+  id: string;
+  caseId: string;
+  orgId: string;
+  seq: number;
+  type: string;
+  actor: string;
+  payload: string;
+  occurredAt: string;
+  prevHash: string;
+  hash: string;
+}
+
+function mapCase(row: Row): DeskCase {
+  return {
+    id: String(row.id),
+    orgId: String(row.org_id),
+    reportId: nullable(row.report_id),
+    productId: String(row.product_id),
+    kind: String(row.kind) as DeskCaseKind,
+    title: String(row.title),
+    status: String(row.status) as DeskCase["status"],
+    awareAt: String(row.aware_at),
+    awareRecordedBy: String(row.aware_recorded_by),
+    correctiveAvailableAt: nullable(row.corrective_available_at),
+    notificationSubmittedAt: nullable(row.notification_submitted_at),
+    earlyWarningDueAt: String(row.early_warning_due_at),
+    notificationDueAt: String(row.notification_due_at),
+    finalDueAt: nullable(row.final_due_at),
+    acknowledgedAt: nullable(row.acknowledged_at),
+    acknowledgedBy: nullable(row.acknowledged_by),
+    createdAt: String(row.created_at),
+    updatedAt: String(row.updated_at),
+  };
+}
+
+function mapEvent(row: Row): DeskCaseEvent {
+  return {
+    id: String(row.id),
+    caseId: String(row.case_id),
+    orgId: String(row.org_id),
+    seq: Number(row.seq),
+    type: String(row.type),
+    actor: String(row.actor),
+    payload: String(row.payload),
+    occurredAt: String(row.occurred_at),
+    prevHash: String(row.prev_hash),
+    hash: String(row.hash),
+  };
+}
+
+const INSERT_EVENT = `INSERT INTO desk_case_events
+  (id, org_id, case_id, seq, type, actor, payload, occurred_at, prev_hash, hash)
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`;
+
+function eventParams(e: DeskCaseEvent): unknown[] {
+  return [e.id, e.orgId, e.caseId, e.seq, e.type, e.actor, e.payload, e.occurredAt, e.prevHash, e.hash];
+}
+
+const UPDATE_CASE = `UPDATE desk_cases SET
+  status = $3, aware_at = $4, corrective_available_at = $5, notification_submitted_at = $6,
+  early_warning_due_at = $7, notification_due_at = $8, final_due_at = $9,
+  acknowledged_at = $10, acknowledged_by = $11, updated_at = $12
+  WHERE org_id = $1 AND id = $2`;
+
+function caseParams(c: DeskCase): unknown[] {
+  return [
+    c.orgId, c.id, c.status, c.awareAt, c.correctiveAvailableAt, c.notificationSubmittedAt,
+    c.earlyWarningDueAt, c.notificationDueAt, c.finalDueAt, c.acknowledgedAt, c.acknowledgedBy, c.updatedAt,
+  ];
+}
+
 export type SlugWrite = { ok: true; settings: DeskSettings } | { ok: false; reason: "slug_taken" };
 
 /** Every statement scopes by org_id; nothing here reads across tenants. */
@@ -250,6 +345,63 @@ export function createDeskRepository(executor: SqlExecutor) {
         })),
       ]);
       return this.listEscalation(orgId);
+    },
+
+    async listCases(orgId: string, limit = 100): Promise<DeskCase[]> {
+      const { rows } = await executor.execute<Row>(
+        `SELECT * FROM desk_cases WHERE org_id = $1 ORDER BY created_at DESC, id LIMIT $2`,
+        [orgId, limit],
+      );
+      return rows.map(mapCase);
+    },
+
+    async getCase(orgId: string, id: string): Promise<DeskCase | null> {
+      const { rows } = await executor.execute<Row>(`SELECT * FROM desk_cases WHERE org_id = $1 AND id = $2`, [orgId, id]);
+      return rows[0] ? mapCase(rows[0]) : null;
+    },
+
+    async listCaseEvents(orgId: string, caseId: string): Promise<DeskCaseEvent[]> {
+      const { rows } = await executor.execute<Row>(
+        `SELECT * FROM desk_case_events WHERE org_id = $1 AND case_id = $2 ORDER BY seq`,
+        [orgId, caseId],
+      );
+      return rows.map(mapEvent);
+    },
+
+    /** The case and its first event arrive together or not at all. */
+    async insertCase(c: DeskCase, first: DeskCaseEvent): Promise<void> {
+      await executeBatch(executor, [
+        {
+          text: `INSERT INTO desk_cases
+            (id, org_id, report_id, product_id, kind, title, status, aware_at, aware_recorded_by,
+             corrective_available_at, notification_submitted_at, early_warning_due_at, notification_due_at,
+             final_due_at, acknowledged_at, acknowledged_by, created_at, updated_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`,
+          params: [
+            c.id, c.orgId, c.reportId, c.productId, c.kind, c.title, c.status, c.awareAt, c.awareRecordedBy,
+            c.correctiveAvailableAt, c.notificationSubmittedAt, c.earlyWarningDueAt, c.notificationDueAt,
+            c.finalDueAt, c.acknowledgedAt, c.acknowledgedBy, c.createdAt, c.updatedAt,
+          ],
+        },
+        { text: INSERT_EVENT, params: eventParams(first) },
+      ]);
+    },
+
+    /**
+     * Appends an event and writes the case state it implies, atomically.
+     * False means another writer took this position in the chain: re-read and retry.
+     */
+    async appendCaseEvent(c: DeskCase, event: DeskCaseEvent): Promise<boolean> {
+      try {
+        await executeBatch(executor, [
+          { text: INSERT_EVENT, params: eventParams(event) },
+          { text: UPDATE_CASE, params: caseParams(c) },
+        ]);
+        return true;
+      } catch (err) {
+        if (isUniqueViolation(err)) return false;
+        throw err;
+      }
     },
 
     /** The one read of settings by public address; only a published page answers. */

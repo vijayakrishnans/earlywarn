@@ -6,6 +6,7 @@ import type { Env } from "./env.js";
 import { fail, invalid, notFound, ok } from "./http.js";
 import { handlePublicRoute, isPublicPath } from "./public.js";
 import { handleReportRoute } from "./reports.js";
+import { handleCaseRoute } from "./cases.js";
 import { orgPublicId, parseOrgId, parseProductId, productPublicId, stepPublicId } from "./ids.js";
 import { fetchAuthorizationContext } from "./membership-client.js";
 import { authorizeViaPolicy } from "./policy-client.js";
@@ -123,6 +124,10 @@ async function handleOrgRoute(
 
   if (path === "reports" || path.startsWith("reports/")) {
     return handleReportRoute(request, env, repo, createEventsRepository(executor), orgId, path, body, requestId, now);
+  }
+
+  if (path === "cases" || path.startsWith("cases/")) {
+    return handleCaseRoute(request, repo, orgId, path, body, requestId);
   }
 
   if (path === "settings") {

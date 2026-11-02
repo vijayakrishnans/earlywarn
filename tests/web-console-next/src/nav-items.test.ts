@@ -80,6 +80,7 @@ describe("buildNavSections under the Solo (M0) profile", () => {
     expect(org.label).toBe("Org · acme");
     expect(org.links.map((l) => l.href)).toEqual([
       "/orgs/acme/desk",
+      "/orgs/acme/desk/cases",
       "/orgs/acme/desk/reports",
       "/orgs/acme/desk/products",
       "/orgs/acme/desk/escalation",

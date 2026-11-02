@@ -107,3 +107,53 @@ export type DeskReportSummary = Omit<PublicDeskReport, "details" | "reporterCont
 export interface ListDeskReportsResponse { reports: DeskReportSummary[]; triageTargetMinutes: number }
 export interface DeskReportResponse { report: PublicDeskReport }
 export interface DeskReportReceipt { status: "received" | "acknowledged"; receivedAt: string; acknowledgedAt: string | null }
+
+export const DESK_CASE_KINDS = ["vulnerability", "incident"] as const;
+export type DeskCaseKind = (typeof DESK_CASE_KINDS)[number];
+
+export interface PublicDeskCase {
+  id: string;
+  orgId: string;
+  reportId: string | null;
+  productId: string;
+  kind: DeskCaseKind;
+  title: string;
+  status: "open" | "closed";
+  awareAt: string;
+  awareRecordedBy: string;
+  correctiveAvailableAt: string | null;
+  notificationSubmittedAt: string | null;
+  earlyWarningDueAt: string;
+  notificationDueAt: string;
+  finalDueAt: string | null;
+  acknowledgedAt: string | null;
+  acknowledgedBy: string | null;
+  createdAt: string;
+}
+
+export interface PublicDeskCaseEvent {
+  seq: number;
+  type: string;
+  actor: string;
+  payload: Record<string, unknown>;
+  occurredAt: string;
+  prevHash: string;
+  hash: string;
+}
+
+export interface CreateDeskCaseRequest {
+  productId: string;
+  kind: DeskCaseKind;
+  title: string;
+  /** When a named person became aware. May be earlier than now, never later. */
+  awareAt: string;
+  reportId?: string | null;
+}
+
+export interface ListDeskCasesResponse { cases: PublicDeskCase[] }
+export interface DeskCaseResponse { case: PublicDeskCase }
+export interface DeskCaseDetailResponse {
+  case: PublicDeskCase;
+  events: PublicDeskCaseEvent[];
+  chainValid: boolean;
+}

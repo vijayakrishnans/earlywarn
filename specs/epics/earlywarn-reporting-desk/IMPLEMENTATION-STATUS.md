@@ -7,7 +7,7 @@ As-built ≠ intent. This file records what actually shipped, and every place th
 | EW0 — the spec | ✅ | #3 |
 | EW1 — the register | ✅ on stage (#4, #5); prod sign-in still blocked | #5 |
 | EW2 — public intake | Code merged (#6, deploy fixed in EW-5); needs `DESK_ENCRYPTION_KEY` seeded | #6 |
-| EW3 — cases and clocks | | |
+| EW3 — cases and clocks | Merged when this PR lands; verify on stage | this PR |
 | EW4 — escalation | | |
 | EW5 — the SRP packet | | |
 | EW6 — the front door | | |
@@ -33,3 +33,7 @@ The design placed the public page in the console. It is served as plain HTML by 
 ### The key was declared as required (EW-5)
 
 EW-4 listed `DESK_ENCRYPTION_KEY` under `secretEnv`, so every `desk-worker` lane failed with `Secret not found` before the key existed, and #6 reached `main` with those lanes red. `desk-worker` stayed on its EW-3 build while the edge and migration 210 deployed. EW-5 moves the key to `optionalSecretEnv`, the baseline's form for secrets seeded after deploy.
+
+### Cases as built (EW-6)
+
+Case status is `open` or `closed`; which reports have been filed is tracked by submissions in EW5 rather than by further statuses. A case is opened from a report with `reportId` on `POST /desk/cases` rather than a route under the report. Actions are `/notes`, `/awareness`, `/corrective-measure`, `/acknowledge` and `/close`. See EW-J for the limits of the chain and EW-K for what is stored in clear.
