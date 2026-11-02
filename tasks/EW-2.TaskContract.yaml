@@ -1,0 +1,17 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: EW-2
+  title: "Turn off Solo mode so organizations have teams and webhooks"
+spec:
+  goal: Earlywarn runs as a multi-member product, because escalation chains need more than one person and alerts need webhooks.
+  affects:
+    - apps/api-edge/wrangler.template.jsonc
+    - apps/identity-worker/wrangler.template.jsonc
+    - apps/membership-worker/wrangler.template.jsonc
+    - apps/web-console-next/next.config.mjs
+    - specs/epics/earlywarn-reporting-desk/**
+    - tasks/**
+  doneWhen:
+    - Organization members and webhooks routes answer on stage instead of being suppressed.
+  gates: []

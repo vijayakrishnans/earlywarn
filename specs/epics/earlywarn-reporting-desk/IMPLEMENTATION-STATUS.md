@@ -4,7 +4,7 @@ As-built ≠ intent. This file records what actually shipped, and every place th
 
 | Milestone | State | PR |
 |---|---|---|
-| EW0 — the spec | | |
+| EW0 — the spec | ✅ | #3 |
 | EW1 — the register | | |
 | EW2 — public intake | | |
 | EW3 — cases and clocks | | |
@@ -13,3 +13,11 @@ As-built ≠ intent. This file records what actually shipped, and every place th
 | EW6 — the front door | | |
 
 ## Departures from the design
+
+### Solo mode switched off (EW-2)
+
+The design assumed teams and webhooks were on. The baseline ships with `SOLO_MODE=true`, which hides members, invitations, projects and webhooks, so EW-2 turns it off in the edge, identity, membership and the console build.
+
+### Sign-in has no production path yet (open)
+
+The baseline's stage returns sign-in codes in the API response (`DEBUG_DELIVERY=true`). Prod sends them by email, which needs a verified domain, and no OAuth provider is configured. Until one of those exists nobody can sign in on prod.
