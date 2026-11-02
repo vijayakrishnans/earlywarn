@@ -63,6 +63,14 @@ function Inner({ orgId, orgSlug }: { orgId: string; orgSlug: string }) {
     else toast({ kind: "error", title: "Could not open the case", description: result.error.message });
   };
 
+  const tryOut = async () => {
+    setBusy(true);
+    const result = await wrap(() => client.desk.openSampleCase(orgId));
+    setBusy(false);
+    if (result.ok) router.push(`/orgs/${orgSlug}/desk/cases/${result.data.case.id}`);
+    else toast({ kind: "error", title: "Could not open a practice case", description: result.error.message });
+  };
+
   const now = Date.now();
   return (
     <div className="space-y-6">
@@ -137,7 +145,13 @@ function Inner({ orgId, orgSlug }: { orgId: string; orgSlug: string }) {
 
       {cases.loading && !cases.data ? <Skeleton className="h-24 w-full" /> : null}
       {cases.error ? <p className="text-sm text-destructive">{cases.error.message}</p> : null}
-      {cases.data?.length === 0 ? <EmptyState title="No cases" description="Nothing is on the clock." /> : null}
+      {cases.data?.length === 0 ? (
+        <EmptyState
+          title="No cases"
+          description="Nothing is on the clock. A practice case lets you try the whole flow; it alerts nobody."
+          primaryAction={{ label: "Open a practice case", onClick: () => void tryOut() }}
+        />
+      ) : null}
       <div className="space-y-3">
         {(cases.data ?? []).map((c: PublicDeskCase) => (
           <Card key={c.id}>
@@ -154,7 +168,10 @@ function Inner({ orgId, orgSlug }: { orgId: string; orgSlug: string }) {
                 </CardDescription>
               </div>
               <div className="flex gap-2">
-                {c.status === "open" && !c.acknowledgedAt ? <Badge variant="destructive">Not acknowledged</Badge> : null}
+                {c.isSample ? <Badge variant="outline">Practice</Badge> : null}
+                {c.status === "open" && !c.acknowledgedAt && !c.isSample ? (
+                  <Badge variant="destructive">Not acknowledged</Badge>
+                ) : null}
                 <Badge variant="secondary">{c.status}</Badge>
               </div>
             </CardHeader>

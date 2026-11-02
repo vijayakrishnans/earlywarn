@@ -173,6 +173,7 @@ export async function exportEvidence(
       verifyWith: "tooling/desk/verify-evidence.mjs in the Earlywarn repository",
       headHash: events[events.length - 1]?.hash ?? null,
       case: {
+        isSample: c.isSample,
         id: casePublicId(c.id),
         internalId: c.id,
         orgId: orgPublicId(c.orgId),

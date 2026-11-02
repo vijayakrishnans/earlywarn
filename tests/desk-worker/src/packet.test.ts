@@ -128,7 +128,7 @@ describe("recording a filing", () => {
       id: "c", orgId: "o", reportId: null, productId: "p", kind: "vulnerability" as const, title: "T", status: "open" as const,
       awareAt: iso(0), awareRecordedBy: "u", correctiveAvailableAt: null, notificationSubmittedAt: null,
       earlyWarningDueAt: iso(24), notificationDueAt: iso(72), finalDueAt: null, acknowledgedAt: iso(0), acknowledgedBy: "u",
-      createdAt: iso(0), updatedAt: iso(0),
+      isSample: false, createdAt: iso(0), updatedAt: iso(0),
     };
     const chain = [{ id: "a", position: 1, name: "A", email: "a@example.com", afterMinutes: 0, channels: ["email"] }];
     const owed = planCaseAlerts(c, chain, new Set(["early_warning"]), new Set(), Date.parse(iso(20)));

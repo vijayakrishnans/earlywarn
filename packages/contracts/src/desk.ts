@@ -128,6 +128,8 @@ export interface PublicDeskCase {
   finalDueAt: string | null;
   acknowledgedAt: string | null;
   acknowledgedBy: string | null;
+  /** A practice case: it alerts nobody and is not a real record. */
+  isSample: boolean;
   createdAt: string;
 }
 

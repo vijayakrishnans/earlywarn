@@ -156,6 +156,7 @@ export interface DeskCase {
   finalDueAt: string | null;
   acknowledgedAt: string | null;
   acknowledgedBy: string | null;
+  isSample: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -191,6 +192,7 @@ function mapCase(row: Row): DeskCase {
     finalDueAt: nullable(row.final_due_at),
     acknowledgedAt: nullable(row.acknowledged_at),
     acknowledgedBy: nullable(row.acknowledged_by),
+    isSample: Number(row.is_sample) === 1,
     createdAt: String(row.created_at),
     updatedAt: String(row.updated_at),
   };
@@ -375,6 +377,14 @@ export function createDeskRepository(executor: SqlExecutor) {
       return rows.map(mapCase);
     },
 
+    async findOpenSample(orgId: string): Promise<DeskCase | null> {
+      const { rows } = await executor.execute<Row>(
+        `SELECT * FROM desk_cases WHERE org_id = $1 AND is_sample = 1 AND status = 'open' LIMIT 1`,
+        [orgId],
+      );
+      return rows[0] ? mapCase(rows[0]) : null;
+    },
+
     async getCase(orgId: string, id: string): Promise<DeskCase | null> {
       const { rows } = await executor.execute<Row>(`SELECT * FROM desk_cases WHERE org_id = $1 AND id = $2`, [orgId, id]);
       return rows[0] ? mapCase(rows[0]) : null;
@@ -395,12 +405,12 @@ export function createDeskRepository(executor: SqlExecutor) {
           text: `INSERT INTO desk_cases
             (id, org_id, report_id, product_id, kind, title, status, aware_at, aware_recorded_by,
              corrective_available_at, notification_submitted_at, early_warning_due_at, notification_due_at,
-             final_due_at, acknowledged_at, acknowledged_by, created_at, updated_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)`,
+             final_due_at, acknowledged_at, acknowledged_by, created_at, updated_at, is_sample)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
           params: [
             c.id, c.orgId, c.reportId, c.productId, c.kind, c.title, c.status, c.awareAt, c.awareRecordedBy,
             c.correctiveAvailableAt, c.notificationSubmittedAt, c.earlyWarningDueAt, c.notificationDueAt,
-            c.finalDueAt, c.acknowledgedAt, c.acknowledgedBy, c.createdAt, c.updatedAt,
+            c.finalDueAt, c.acknowledgedAt, c.acknowledgedBy, c.createdAt, c.updatedAt, c.isSample ? 1 : 0,
           ],
         },
         { text: INSERT_EVENT, params: eventParams(first) },
@@ -446,7 +456,7 @@ export function createDeskRepository(executor: SqlExecutor) {
     /** Scheduler only: every open case on the platform, soonest deadline first. */
     async listOpenCasesForScheduler(limit: number): Promise<DeskCase[]> {
       const { rows } = await executor.execute<Row>(
-        `SELECT * FROM desk_cases WHERE status = 'open' ORDER BY notification_due_at, id LIMIT $1`,
+        `SELECT * FROM desk_cases WHERE status = 'open' AND is_sample = 0 ORDER BY notification_due_at, id LIMIT $1`,
         [limit],
       );
       return rows.map(mapCase);

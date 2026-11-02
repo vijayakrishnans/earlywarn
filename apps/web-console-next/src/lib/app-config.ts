@@ -40,7 +40,7 @@ const BUILD_DEPLOY_ENV: string | undefined =
 /** This tree's own identity: what a deploy with no runtime `vars` serves. */
 export const DEFAULT_APP_CONFIG: AppConfig = {
   productName: "earlywarn",
-  productDescription: "Next-gen control plane for your projects, environments, and entitlements.",
+  productDescription: "Never miss a Cyber Resilience Act reporting deadline: disclosure intake, recorded awareness, escalation until acknowledged, and evidence you can verify.",
   workersDevSubdomain: "vijayakrishnan12994",
   apiWorkerPrefix: "earlywarn-api-edge",
   storagePrefix: "earlywarn.next",

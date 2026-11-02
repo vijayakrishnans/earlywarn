@@ -10,7 +10,7 @@ As-built ≠ intent. This file records what actually shipped, and every place th
 | EW3 — cases and clocks | ✅ | #8 |
 | EW4 — escalation | Scheduler proven on stage; email needs a domain; prod needs sign-in | #9, EW-9 |
 | EW5 — the SRP packet | Merged; field mapping not checked against the portal (EW-G) | #10 |
-| EW6 — the front door | | |
+| EW6 — the front door | Merged when this PR lands; sign-up on prod blocked on sign-in | this PR |
 
 ## Departures from the design
 
@@ -51,3 +51,7 @@ The chain starts when a case is opened, not at a backdated awareness, so a late-
 EW-7 reached stage unable to send email: `notifications-worker` only accepts listed internal callers and `desk-worker` was not listed, and the unit tests mocked that worker. EW-9 adds it, with a test against the real router and validator.
 
 `case.alert_sent` means the alert was handed over, not that it arrived. Without a verified sending domain the provider fails after accepting the request, so an email-only step can show as alerted and reach nobody. Until a domain is verified, chains should include a webhook; see EW-D.
+
+### Front door (EW-10)
+
+The sample case has no product (`prd_sample`), so it cannot turn the readiness checklist green, and the scheduler's query excludes it. There is no separate terms page: the landing page states the limits, and real terms need a lawyer (EW-A).

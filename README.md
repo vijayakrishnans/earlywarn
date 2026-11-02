@@ -6,6 +6,16 @@ twelve bounded-context Workers behind one public edge API, a Next.js console
 on Workers + Static Assets, and Cloudflare D1 and KV as the data plane.
 Merges to `main` deploy it to `stage` and `prod`.
 
+## The product
+
+Earlywarn is a reporting desk for the EU Cyber Resilience Act's 24-hour duty: a disclosure page, recorded awareness and deadlines, escalation until someone acknowledges, the fields for each stage of ENISA's Single Reporting Platform, and evidence that verifies offline. It does not file for you and it is not legal advice. The design of record is [specs/epics/earlywarn-reporting-desk](specs/epics/earlywarn-reporting-desk/README.md).
+
+**Paging tools.** Add a webhook under Settings and subscribe it to `desk.case.escalated`, `desk.case.deadline` and `desk.report.alert`. Each delivery is signed, carries `headline`, `detail`, `url` and the timeline's `chainHead`, and never carries report contents or recipients' addresses. Point it at an adapter for Slack or PagerDuty. `desk.test_alert` fires from the Escalation page's test button.
+
+**Checking evidence.** `node tooling/desk/verify-evidence.mjs export.json` needs no account, network or dependencies.
+
+**Secrets.** Reports need `DESK_ENCRYPTION_KEY` (base64 of 32 random bytes) per environment; until it is set, the page refuses reports with a 503. Rotating it makes existing reports unreadable, as there is no re-encryption yet.
+
 ## Live deployment
 
 <!-- 08-docs:begin -->
