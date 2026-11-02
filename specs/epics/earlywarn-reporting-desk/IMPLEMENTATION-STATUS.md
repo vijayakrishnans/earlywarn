@@ -5,12 +5,19 @@ As-built ≠ intent. This file records what actually shipped, and every place th
 | Milestone | State | PR |
 |---|---|---|
 | EW0 — the spec | ✅ | #3 |
-| EW1 — the register | ✅ on stage (#4, #5); prod sign-in still blocked | #5 |
-| EW2 — public intake | Code merged (#6, deploy fixed in EW-5); needs `DESK_ENCRYPTION_KEY` seeded | #6 |
-| EW3 — cases and clocks | ✅ | #8 |
-| EW4 — escalation | Scheduler proven on stage; email needs a domain; prod needs sign-in | #9, EW-9 |
-| EW5 — the SRP packet | Merged; field mapping not checked against the portal (EW-G) | #10 |
-| EW6 — the front door | Merged when this PR lands; sign-up on prod blocked on sign-in | this PR |
+| EW1 — the register | ✅ on stage. Prod sign-in blocked | #4, #5 |
+| EW2 — public intake | Page and security.txt live. Reports, triage and receipts proven only by test until `DESK_ENCRYPTION_KEY` is seeded | #6, #7 |
+| EW3 — cases and clocks | ✅ on stage | #8 |
+| EW4 — escalation | Chain and webhook events proven on stage, webhook delivery and email arrival not. Prod not proven | #9, #11 |
+| EW5 — the SRP packet | ✅ on stage. Field map not checked against the portal | #10 |
+| EW6 — the front door | Landing page and practice case on stage. Prod sign-up blocked | #12, #13, this PR |
+
+## What blocks release
+
+1. **Sign-in on prod.** A verified email domain or an OAuth provider. Until then no one can sign in on prod, so EW1, EW4 and EW6's prod facts cannot be shown. Stage returns sign-in codes in API responses and must not hold real data.
+2. **`DESK_ENCRYPTION_KEY`** per environment. Until then disclosure pages answer 503 to submissions.
+3. **Email delivery.** Needs the same verified domain. `case.alert_sent` means handed over, not delivered.
+4. **A lawyer's review** of the copy and terms, and **customer conversations**, before charging (EW-A, EW-C, EW-I).
 
 ## Departures from the design
 
