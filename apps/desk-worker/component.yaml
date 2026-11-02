@@ -45,6 +45,7 @@ spec:
   secretEnv:
     WIRING_CLOUDFLARE_D1_STAGE: "secret://ws_HTQG7F27/earlywarn/stage/WIRING_CLOUDFLARE_D1"
     WIRING_CLOUDFLARE_D1_PROD: "secret://ws_HTQG7F27/earlywarn/prod/WIRING_CLOUDFLARE_D1"
+    DESK_ENCRYPTION_KEY: "secret://ws_HTQG7F27/earlywarn/{{ .environment }}/DESK_ENCRYPTION_KEY"
 
   subscribe:
     environments:
@@ -90,6 +91,7 @@ spec:
     wiringComponents: "cloudflare-d1"
     wiringEnvs: "stage,prod"
     wiringFixture: wiring.fixture.json
+    runtimeSecrets: "DESK_ENCRYPTION_KEY"
     installCommand: pnpm install --frozen-lockfile
     buildCommand: pnpm exec turbo run build --filter=@saas/desk-worker
     typecheckCommand: pnpm exec turbo run typecheck --filter=@saas/desk-worker

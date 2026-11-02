@@ -192,5 +192,14 @@ export const manifest: MigrationManifest = {
       description:
         "Reporting desk register — products, desk settings, escalation chain",
     },
+    {
+      id: "210_desk_reports",
+      context: "desk",
+      path: "210_desk_reports/up.sql",
+      checksum:
+        "0e7bf4b437f63d2d71dcfe5f4fb2e45c7c8cc490e8eccc7d0c873a9df7cfec3f",
+      description:
+        "Reports received through the public disclosure page, sealed at rest",
+    },
   ],
 };

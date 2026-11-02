@@ -108,6 +108,35 @@ function mapStep(row: Row): EscalationStep {
   };
 }
 
+export type DeskReportStatus = "new" | "triaged" | "duplicate" | "rejected";
+
+export interface DeskReportRow {
+  id: string;
+  orgId: string;
+  sealed: string;
+  status: DeskReportStatus;
+  receivedAt: string;
+  acknowledgedAt: string | null;
+}
+
+export interface DeskDisclosure {
+  orgId: string;
+  publicSlug: string;
+  policyText: string;
+  publishedAt: string;
+}
+
+function mapReport(row: Row): DeskReportRow {
+  return {
+    id: String(row.id),
+    orgId: String(row.org_id),
+    sealed: String(row.sealed),
+    status: String(row.status) as DeskReportStatus,
+    receivedAt: String(row.received_at),
+    acknowledgedAt: nullable(row.acknowledged_at),
+  };
+}
+
 export type SlugWrite = { ok: true; settings: DeskSettings } | { ok: false; reason: "slug_taken" };
 
 /** Every statement scopes by org_id; nothing here reads across tenants. */
@@ -221,6 +250,72 @@ export function createDeskRepository(executor: SqlExecutor) {
         })),
       ]);
       return this.listEscalation(orgId);
+    },
+
+    /** The one read of settings by public address; only a published page answers. */
+    async getDisclosure(slug: string): Promise<DeskDisclosure | null> {
+      const { rows } = await executor.execute<Row>(
+        `SELECT org_id, public_slug, policy_text, disclosure_published_at FROM desk_settings
+          WHERE public_slug = $1 AND disclosure_published_at IS NOT NULL AND policy_text IS NOT NULL`,
+        [slug],
+      );
+      const row = rows[0];
+      if (!row) return null;
+      return {
+        orgId: String(row.org_id),
+        publicSlug: String(row.public_slug),
+        policyText: String(row.policy_text),
+        publishedAt: String(row.disclosure_published_at),
+      };
+    },
+
+    async createReport(orgId: string, id: string, sealed: string, receiptHash: string, now: string): Promise<void> {
+      await executor.execute(
+        `INSERT INTO desk_reports (id, org_id, sealed, receipt_hash, received_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $5)`,
+        [id, orgId, sealed, receiptHash, now],
+      );
+    },
+
+    async getReceipt(receiptHash: string): Promise<Pick<DeskReportRow, "status" | "receivedAt" | "acknowledgedAt"> | null> {
+      const { rows } = await executor.execute<Row>(
+        `SELECT status, received_at, acknowledged_at FROM desk_reports WHERE receipt_hash = $1`,
+        [receiptHash],
+      );
+      const row = rows[0];
+      if (!row) return null;
+      return {
+        status: String(row.status) as DeskReportStatus,
+        receivedAt: String(row.received_at),
+        acknowledgedAt: nullable(row.acknowledged_at),
+      };
+    },
+
+    async listReports(orgId: string, limit = 100): Promise<DeskReportRow[]> {
+      const { rows } = await executor.execute<Row>(
+        `SELECT * FROM desk_reports WHERE org_id = $1 ORDER BY received_at DESC, id LIMIT $2`,
+        [orgId, limit],
+      );
+      return rows.map(mapReport);
+    },
+
+    async getReport(orgId: string, id: string): Promise<DeskReportRow | null> {
+      const { rows } = await executor.execute<Row>(
+        `SELECT * FROM desk_reports WHERE org_id = $1 AND id = $2`,
+        [orgId, id],
+      );
+      return rows[0] ? mapReport(rows[0]) : null;
+    },
+
+    /** Any status decision also acknowledges receipt to the reporter, once. */
+    async setReportStatus(orgId: string, id: string, status: DeskReportStatus, now: string): Promise<DeskReportRow | null> {
+      const { rows } = await executor.execute<Row>(
+        `UPDATE desk_reports
+            SET status = $3, acknowledged_at = COALESCE(acknowledged_at, $4), updated_at = $4
+          WHERE org_id = $1 AND id = $2 RETURNING *`,
+        [orgId, id, status, now],
+      );
+      return rows[0] ? mapReport(rows[0]) : null;
     },
   };
 }

@@ -1,0 +1,27 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: EW-4
+  title: "Public intake: disclosure page, sealed reports, receipts, triage"
+spec:
+  goal: A stranger can report a vulnerability on a published page, and only that organization can read it.
+  affects:
+    - default/earlywarn/api-edge
+    - default/earlywarn/api-edge-tests
+    - default/earlywarn/contracts
+    - default/earlywarn/db
+    - default/earlywarn/db-migrate
+    - default/earlywarn/db-tests
+    - default/earlywarn/desk-worker
+    - default/earlywarn/desk-worker-tests
+    - default/earlywarn/sdk
+    - default/earlywarn/web-console-next
+    - default/earlywarn/web-console-next-tests
+    - specs/epics/earlywarn-reporting-desk/**
+    - tasks/**
+  doneWhen:
+    - An unauthenticated submission on stage appears in triage for that organization only.
+    - The stored row holds ciphertext, by test.
+    - The receipt returns status and no contents.
+    - security.txt carries RFC 9116's required fields.
+  gates: []

@@ -52,6 +52,7 @@ export type RouteFamily =
   | "org"
   | "project"
   | "desk"
+  | "intake"
   | "config"
   | "webhooks"
   | "metering"
@@ -91,6 +92,11 @@ const LIMITS: Record<RouteFamily, FamilyConfig> = {
   },
   project: {
     identity: { limit: 60, windowSec: 60 },
+    org: { limit: 300, windowSec: 60 },
+  },
+  // Public disclosure pages: per caller IP, tight because nobody is signed in.
+  intake: {
+    identity: { limit: 20, windowSec: 60 },
     org: { limit: 300, windowSec: 60 },
   },
   desk: {

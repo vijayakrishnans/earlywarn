@@ -1,8 +1,11 @@
 import type { PublicDeskProduct, PublicDeskSettings, PublicEscalationStep } from "@saas/contracts/desk";
-import { createSqlExecutor } from "@saas/db/d1";
+import { createSqlExecutor, type SqlExecutor } from "@saas/db/d1";
+import { createEventsRepository } from "@saas/db/events";
 import { createDeskRepository, type DeskProduct, type DeskRepository, type DeskSettings } from "@saas/db/desk";
 import type { Env } from "./env.js";
 import { fail, invalid, notFound, ok } from "./http.js";
+import { handlePublicRoute, isPublicPath } from "./public.js";
+import { handleReportRoute } from "./reports.js";
 import { orgPublicId, parseOrgId, parseProductId, productPublicId, stepPublicId } from "./ids.js";
 import { fetchAuthorizationContext } from "./membership-client.js";
 import { authorizeViaPolicy } from "./policy-client.js";
@@ -55,6 +58,7 @@ async function readJson(request: Request): Promise<{ ok: true; body: unknown } |
 async function handleOrgRoute(
   request: Request,
   env: Env,
+  executor: SqlExecutor,
   repo: DeskRepository,
   orgId: string,
   path: string,
@@ -115,6 +119,10 @@ async function handleOrgRoute(
       return (await repo.deleteProduct(orgId, id, now)) ? ok({ deleted: true }, requestId) : notFound(requestId);
     }
     return fail("unsupported", "Method not allowed", 405, requestId);
+  }
+
+  if (path === "reports" || path.startsWith("reports/")) {
+    return handleReportRoute(request, env, repo, createEventsRepository(executor), orgId, path, body, requestId, now);
   }
 
   if (path === "settings") {
@@ -191,18 +199,20 @@ export async function route(request: Request, env: Env): Promise<Response> {
     );
   }
 
-  if (!env.PLATFORM_DB || !env.MEMBERSHIP_WORKER || !env.POLICY_WORKER) {
-    return fail("internal_error", "Service unavailable", 503, requestId);
-  }
+  if (!env.PLATFORM_DB) return fail("internal_error", "Service unavailable", 503, requestId);
 
   const executor = createSqlExecutor(env.PLATFORM_DB);
   try {
     const repo = createDeskRepository(executor);
+    if (isPublicPath(url.pathname)) return await handlePublicRoute(request, env, repo, url.pathname, requestId);
+    if (!env.MEMBERSHIP_WORKER || !env.POLICY_WORKER) {
+      return fail("internal_error", "Service unavailable", 503, requestId);
+    }
     const match = url.pathname.match(ORG_ROUTE_RE);
     if (!match) return notFound(requestId);
     const orgId = parseOrgId(match[1]!);
     if (!orgId) return notFound(requestId);
-    return await handleOrgRoute(request, env, repo, orgId, match[2]!, requestId);
+    return await handleOrgRoute(request, env, executor, repo, orgId, match[2]!, requestId);
   } catch {
     return fail("internal_error", "An unexpected error occurred", 500, requestId);
   } finally {
