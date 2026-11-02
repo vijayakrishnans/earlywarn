@@ -1,0 +1,14 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: EW-11
+  title: "Deploy desk-worker only after its migrations"
+spec:
+  goal: A failed migration lane can no longer leave desk-worker running against a schema it does not match.
+  affects:
+    - default/earlywarn/desk-worker
+    - specs/epics/earlywarn-reporting-desk/**
+    - tasks/**
+  doneWhen:
+    - desk-worker declares an enforced dependency on db-migrate, and the plan is valid.
+  gates: []

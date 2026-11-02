@@ -34,6 +34,15 @@ spec:
         - mode: advisory
           when:
             triggerRef: github-pull-request
+    # This worker's queries need the columns its migrations add. Without this edge
+    # it can deploy first, or alone when the migration lane fails, and every query
+    # touching a new column errors until the migration lands.
+    - component: db-migrate
+      mode: enforced
+      modeRules:
+        - mode: advisory
+          when:
+            triggerRef: github-pull-request
     - component: cloudflare-d1
       mode: enforced
       modeRules:
