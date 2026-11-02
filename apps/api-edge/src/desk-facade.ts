@@ -7,6 +7,35 @@ import { createTimings } from "@saas/contracts/timing";
 const ORG_DESK_RE = /^\/v1\/organizations\/[^/]+\/desk\/.+$/;
 const FORWARDED_HEADERS = ["content-type", "traceparent", "idempotency-key"];
 
+const PUBLIC_DESK_RE = /^\/(?:disclose|receipt)\/[^/]+(?:\/security\.txt)?$|^\/v1\/public\/receipts\/[^/]+$/;
+
+export function isPublicDeskRoute(pathname: string): boolean {
+  return PUBLIC_DESK_RE.test(pathname);
+}
+
+/** No session: these answer strangers. Rate limited per IP before reaching the worker. */
+export async function handlePublicDeskRoute(
+  request: Request,
+  env: Env,
+  requestId: string,
+  pathname: string,
+): Promise<Response> {
+  return replayOrExecute(request, requestId, env, "intake", async () => {
+    if (!env.DESK_WORKER) return errorResponse("internal_error", "Desk service unavailable", 503, requestId);
+    const url = new URL(request.url);
+    const headers = new Headers({ "x-request-id": requestId, "x-public-origin": url.origin });
+    const contentType = request.headers.get("content-type");
+    if (contentType) headers.set("content-type", contentType);
+    const init: RequestInit = { method: request.method, headers };
+    if (request.method !== "GET" && request.method !== "HEAD") init.body = request.body;
+    try {
+      return await env.DESK_WORKER.fetch(new URL(pathname, "https://desk.internal").toString(), init);
+    } catch {
+      return errorResponse("internal_error", "Desk service unavailable", 503, requestId);
+    }
+  });
+}
+
 export function isDeskRoute(pathname: string): boolean {
   return ORG_DESK_RE.test(pathname);
 }

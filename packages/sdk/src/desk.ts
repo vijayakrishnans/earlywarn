@@ -1,5 +1,8 @@
 import type {
   DeskProductInput,
+  DeskReportResponse,
+  DeskReportStatus,
+  ListDeskReportsResponse,
   DeskProductResponse,
   DeskReadinessResponse,
   DeskSettingsInput,
@@ -59,5 +62,20 @@ export class DeskClient {
 
   saveEscalation(orgId: string, steps: EscalationStepInput[], opts: RequestOptions = {}): Promise<EscalationChainResponse> {
     return this.transport.request({ method: "PUT", path: this.path(orgId, "escalation"), body: { steps } }, opts);
+  }
+
+  listReports(orgId: string, opts: RequestOptions = {}): Promise<ListDeskReportsResponse> {
+    return this.transport.request({ method: "GET", path: this.path(orgId, "reports") }, opts);
+  }
+
+  getReport(orgId: string, id: string, opts: RequestOptions = {}): Promise<DeskReportResponse> {
+    return this.transport.request({ method: "GET", path: this.path(orgId, `reports/${encodeURIComponent(id)}`) }, opts);
+  }
+
+  setReportStatus(orgId: string, id: string, status: DeskReportStatus, opts: RequestOptions = {}): Promise<DeskReportResponse> {
+    return this.transport.request(
+      { method: "PATCH", path: this.path(orgId, `reports/${encodeURIComponent(id)}`), body: { status } },
+      opts,
+    );
   }
 }

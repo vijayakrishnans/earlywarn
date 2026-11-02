@@ -123,6 +123,8 @@ function SettingsForm({
   const [policy, setPolicy] = React.useState(initial.policyText ?? "");
   const [busy, setBusy] = React.useState(false);
   const published = !!initial.disclosurePublishedAt;
+  const { target } = useSession();
+  const publicUrl = initial.publicSlug ? `${target.url}/disclose/${initial.publicSlug}` : null;
 
   const save = async (extra: Pick<DeskSettingsInput, "published">) => {
     setBusy(true);
@@ -187,6 +189,14 @@ function SettingsForm({
           <Label htmlFor="desk-policy">Disclosure policy</Label>
           <Textarea id="desk-policy" rows={6} value={policy} onChange={(e) => setPolicy(e.target.value)} />
         </div>
+        {published && publicUrl ? (
+          <p className="text-sm">
+            Live at{" "}
+            <a className="underline" href={publicUrl} target="_blank" rel="noreferrer">
+              {publicUrl}
+            </a>
+          </p>
+        ) : null}
         <div className="flex flex-wrap gap-2">
           <Button disabled={busy} onClick={() => void save({})}>
             Save

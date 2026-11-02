@@ -85,3 +85,25 @@ export interface DeskProductResponse { product: PublicDeskProduct }
 export interface DeskSettingsResponse { settings: PublicDeskSettings }
 export interface EscalationChainResponse { steps: PublicEscalationStep[] }
 export interface DeskReadinessResponse { readiness: DeskReadiness }
+
+export const DESK_REPORT_STATUSES = ["new", "triaged", "duplicate", "rejected"] as const;
+export type DeskReportStatus = (typeof DESK_REPORT_STATUSES)[number];
+
+export interface PublicDeskReport {
+  id: string;
+  orgId: string;
+  title: string;
+  details: string;
+  product: string | null;
+  reporterContact: string | null;
+  status: DeskReportStatus;
+  receivedAt: string;
+  acknowledgedAt: string | null;
+}
+
+/** The triage list carries no details; opening one report is what gets audited. */
+export type DeskReportSummary = Omit<PublicDeskReport, "details" | "reporterContact">;
+
+export interface ListDeskReportsResponse { reports: DeskReportSummary[]; triageTargetMinutes: number }
+export interface DeskReportResponse { report: PublicDeskReport }
+export interface DeskReportReceipt { status: "received" | "acknowledged"; receivedAt: string; acknowledgedAt: string | null }

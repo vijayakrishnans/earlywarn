@@ -10,7 +10,7 @@ This doc set, merged to `main`.
 - the five documents are on `main`
 - `task_get earlywarn-reporting-desk` shows the epic with EW0–EW6, and `EW-1` reads `done`
 
-## EW1 — the register
+## EW1 — the register ✅
 
 New `apps/desk-worker` wired behind `api-edge`; migrations for products, settings and escalation steps; products, settings and readiness surfaces.
 
