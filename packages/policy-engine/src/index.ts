@@ -212,6 +212,8 @@ const PROJECT_GRANTABLE_ACTIONS: ReadonlySet<string> = new Set([
 ]);
 
 const ALL_KNOWN_ACTIONS: ReadonlySet<string> = new Set([
+  "desk.read",
+  "desk.write",
   "organization.read",
   "organization.settings.update",
   "organization.invitation.create",

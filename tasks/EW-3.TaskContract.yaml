@@ -6,23 +6,6 @@ metadata:
 spec:
   goal: A workspace can register its products, name its CSIRT, set its escalation chain and see a readiness checklist.
   affects:
-    - apps/desk-worker/**
-    - apps/api-edge/**
-    - apps/policy-worker/component.yaml
-    - apps/web-console-next/**
-    - packages/contracts/**
-    - packages/db/**
-    - packages/policy-engine/**
-    - packages/sdk/**
-    - tests/desk-worker/**
-    - tests/db/**
-    - tests/policy-engine/**
-    - tests/web-console-next/**
-    - tests/api-edge/**
-    - pnpm-lock.yaml
-    - .gitignore
-    - specs/epics/earlywarn-reporting-desk/**
-    - tasks/**
     - api-edge
     - contracts
     - db
@@ -32,11 +15,15 @@ spec:
     - desk-worker-tests
     - policy-engine
     - policy-worker
+    - policy-engine-tests
     - sdk
     - web-console-next
     - web-console-next-tests
     - api-edge-tests
-    - policy-engine-tests
+    - specs/epics/earlywarn-reporting-desk/**
+    - tasks/**
+    - pnpm-lock.yaml
+    - .gitignore
   doneWhen:
     - desk-worker answers through the edge on stage and prod.
     - Migration 200 is applied on stage and prod.
