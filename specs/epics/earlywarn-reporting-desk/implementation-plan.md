@@ -52,7 +52,7 @@ Acknowledgement, chain editor, per-minute scheduler, email and signed webhook de
 - a webhook payload contains no report contents, by test
 - each alert appears on the case timeline
 
-## EW5 — the SRP packet
+## EW5 — the SRP packet ✅
 
 Field catalogue, packet view per stage, missing-required check, submission record, evidence export with an offline verifier.
 

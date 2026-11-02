@@ -1,0 +1,16 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: EW-12
+  title: "Fix the desk's sidebar highlight and record the first release's status"
+spec:
+  goal: The sidebar highlights one desk link at a time, and the status file says what is proven and what blocks release.
+  affects:
+    - default/earlywarn/web-console-next
+    - default/earlywarn/web-console-next-tests
+    - specs/epics/earlywarn-reporting-desk/**
+    - tasks/**
+  doneWhen:
+    - A case page highlights Cases and not Readiness, by test.
+    - IMPLEMENTATION-STATUS.md lists what blocks release.
+  gates: []

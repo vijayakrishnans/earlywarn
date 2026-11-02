@@ -103,6 +103,12 @@ describe("isLinkActive", () => {
     expect(isLinkActive("/account/security", "/account/security")).toBe(true);
   });
 
+  it("keeps Readiness from lighting up beside the desk's other links", () => {
+    expect(isLinkActive("/orgs/acme/desk", "/orgs/acme/desk")).toBe(true);
+    expect(isLinkActive("/orgs/acme/desk", "/orgs/acme/desk/cases/cas_1")).toBe(false);
+    expect(isLinkActive("/orgs/acme/desk/cases", "/orgs/acme/desk/cases/cas_1")).toBe(true);
+  });
+
   it("matches a link when the path is the href or a child of it", () => {
     expect(isLinkActive("/orgs/acme/usage", "/orgs/acme/usage")).toBe(true);
     expect(isLinkActive("/orgs/acme/webhooks", "/orgs/acme/webhooks/ep_123")).toBe(true);

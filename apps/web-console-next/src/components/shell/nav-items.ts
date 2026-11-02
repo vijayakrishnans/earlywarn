@@ -106,5 +106,7 @@ export function isLinkActive(href: string, pathname: string | null): boolean {
   if (!pathname) return false;
   if (href === "/orgs") return pathname === "/orgs";
   if (href === "/account") return pathname === "/account";
+  // The desk's Readiness link is the parent path of its sibling links.
+  if (href.endsWith("/desk")) return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
