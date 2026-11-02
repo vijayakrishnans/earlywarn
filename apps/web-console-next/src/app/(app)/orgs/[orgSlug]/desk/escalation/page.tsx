@@ -57,6 +57,21 @@ function ChainForm({ orgId, initial }: { orgId: string; initial: EscalationStepI
   );
   const [busy, setBusy] = React.useState(false);
 
+  const test = async () => {
+    setBusy(true);
+    const result = await wrap(() => client.desk.sendTestAlert(orgId));
+    setBusy(false);
+    if (result.ok) {
+      toast({
+        kind: "success",
+        title: "Test alert sent",
+        description: `${result.data.emailsQueued} of ${result.data.steps} emails queued. Webhooks subscribed to desk.test_alert receive it within a minute.`,
+      });
+    } else {
+      toast({ kind: "error", title: "Could not send a test alert", description: result.error.message });
+    }
+  };
+
   const update = (index: number, patch: Partial<EscalationStepInput>) =>
     setSteps((current) => current.map((step, i) => (i === index ? { ...step, ...patch } : step)));
 
@@ -137,6 +152,9 @@ function ChainForm({ orgId, initial }: { orgId: string; initial: EscalationStepI
         </Button>
         <Button type="submit" disabled={busy}>
           Save chain
+        </Button>
+        <Button type="button" variant="ghost" disabled={busy || initial.length === 0} onClick={() => void test()}>
+          Send test alert
         </Button>
       </div>
     </form>

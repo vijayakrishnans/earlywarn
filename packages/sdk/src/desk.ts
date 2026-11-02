@@ -83,6 +83,10 @@ export class DeskClient {
     );
   }
 
+  sendTestAlert(orgId: string, opts: RequestOptions = {}): Promise<{ steps: number; emailsQueued: number; webhookEvent: boolean }> {
+    return this.transport.request({ method: "POST", path: this.path(orgId, "escalation/test"), body: {} }, opts);
+  }
+
   listCases(orgId: string, opts: RequestOptions = {}): Promise<ListDeskCasesResponse> {
     return this.transport.request({ method: "GET", path: this.path(orgId, "cases") }, opts);
   }

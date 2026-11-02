@@ -27,6 +27,7 @@ spec:
     # advisory: they are runtime calls, not deploy order. A pull request deploys
     # nothing, so nothing on one waits.
     - component: membership-worker
+    - component: notifications-worker
     - component: policy-worker
       mode: enforced
       modeRules:

@@ -11,6 +11,7 @@
     "paths": {
       "@saas/contracts": ["../../packages/contracts/src/index.ts"],
       "@saas/contracts/*": ["../../packages/contracts/src/*.ts"],
+      "@saas/notifications-client": ["../../packages/notifications-client/src/index.ts"],
       "@saas/db/manifest": ["../../packages/db/src/manifest.ts"],
       "@saas/db/*": ["../../packages/db/src/*/index.ts"],
       "@desk-worker/*": ["../../apps/desk-worker/src/*.ts"]

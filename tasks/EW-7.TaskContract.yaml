@@ -1,0 +1,27 @@
+apiVersion: orun.io/v1
+kind: TaskContract
+metadata:
+  name: EW-7
+  title: "Escalation: acknowledgement chain, deadline reminders, email and signed webhooks"
+spec:
+  goal: An unacknowledged case reaches the next person with no human action, and deadlines keep reminding until filed.
+  affects:
+    - default/earlywarn/db
+    - default/earlywarn/db-migrate
+    - default/earlywarn/db-tests
+    - default/earlywarn/desk-worker
+    - default/earlywarn/desk-worker-tests
+    - default/earlywarn/notifications-worker
+    - default/earlywarn/notifications-worker-tests
+    - default/earlywarn/sdk
+    - default/earlywarn/web-console-next
+    - specs/epics/earlywarn-reporting-desk/**
+    - tasks/**
+    - pnpm-lock.yaml
+  doneWhen:
+    - An unacknowledged test case alerts step one, then reaches step two after its delay, with no human action.
+    - Acknowledging stops the chain and deadline reminders continue.
+    - Re-running a scheduler tick sends nothing twice, by test.
+    - A webhook payload contains no report contents, by test.
+    - Each alert appears on the case timeline.
+  gates: []
