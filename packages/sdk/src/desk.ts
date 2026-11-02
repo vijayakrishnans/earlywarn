@@ -3,6 +3,8 @@ import type {
   DeskCaseDetailResponse,
   DeskCaseResponse,
   ListDeskCasesResponse,
+  DeskPacketResponse,
+  RecordSubmissionRequest,
   DeskProductInput,
   DeskReportResponse,
   DeskReportStatus,
@@ -120,6 +122,18 @@ export class DeskClient {
 
   closeCase(orgId: string, id: string, reason: string, opts: RequestOptions = {}): Promise<DeskCaseResponse> {
     return this.transport.request({ method: "POST", path: `${this.casePath(orgId, id)}/close`, body: { reason } }, opts);
+  }
+
+  getPacket(orgId: string, id: string, stage: string, opts: RequestOptions = {}): Promise<DeskPacketResponse> {
+    return this.transport.request({ method: "GET", path: `${this.casePath(orgId, id)}/packet/${stage}` }, opts);
+  }
+
+  recordSubmission(orgId: string, id: string, body: RecordSubmissionRequest, opts: RequestOptions = {}): Promise<DeskCaseResponse> {
+    return this.transport.request({ method: "POST", path: `${this.casePath(orgId, id)}/submissions`, body }, opts);
+  }
+
+  exportEvidence(orgId: string, id: string, opts: RequestOptions = {}): Promise<Record<string, unknown>> {
+    return this.transport.request({ method: "GET", path: `${this.casePath(orgId, id)}/export` }, opts);
   }
 
   private casePath(orgId: string, id: string): string {

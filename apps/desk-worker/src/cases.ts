@@ -2,6 +2,7 @@ import { DESK_CASE_KINDS, type PublicDeskCase, type PublicDeskCaseEvent } from "
 import type { DeskCase, DeskCaseEvent, DeskCaseKind, DeskRepository } from "@saas/db/desk";
 import { GENESIS_HASH, hashEvent, verifyChain } from "./chain.js";
 import { computeDeadlines } from "./clocks.js";
+import { exportEvidence, handlePacket, recordSubmission } from "./packet.js";
 import { fail, invalid, notFound, ok } from "./http.js";
 import {
   casePublicId,
@@ -53,14 +54,14 @@ function toEvent(e: DeskCaseEvent): PublicDeskCaseEvent {
 }
 
 /** A past-or-present instant, normalised to UTC. Zone offsets are required so "when" is never ambiguous. */
-function pastInstant(value: unknown, now: Date): string | null {
+export function pastInstant(value: unknown, now: Date): string | null {
   if (typeof value !== "string" || !ISO_RE.test(value)) return null;
   const at = new Date(value);
   if (Number.isNaN(at.getTime()) || at.getTime() > now.getTime() + CLOCK_SKEW_MS) return null;
   return at.toISOString();
 }
 
-function requiredText(value: unknown, max: number): string | null {
+export function requiredText(value: unknown, max: number): string | null {
   if (typeof value !== "string") return null;
   const trimmed = value.trim();
   return trimmed && trimmed.length <= max ? trimmed : null;
@@ -269,6 +270,18 @@ export async function handleCaseRoute(
         payload: { availableAt: correctiveAvailableAt, description: description! },
       };
     });
+  }
+
+  if (action === "packet" && method === "GET") {
+    return handlePacket(repo, orgId, caseId, path.split("/")[3], requestId);
+  }
+
+  if (action === "submissions" && method === "POST") {
+    return recordSubmission(repo, orgId, caseId, actor, input, requestId);
+  }
+
+  if (action === "export" && method === "GET") {
+    return exportEvidence(repo, orgId, caseId, requestId);
   }
 
   if (action === "close" && method === "POST") {

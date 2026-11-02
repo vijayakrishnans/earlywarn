@@ -14,6 +14,7 @@
     "./policy": "./src/policy.ts",
     "./projects": "./src/projects.ts",
     "./desk": "./src/desk.ts",
+    "./srp-fields": "./src/srp-fields.ts",
     "./events": "./src/events.ts",
     "./security-events": "./src/security-events.ts",
     "./api-keys": "./src/api-keys.ts",

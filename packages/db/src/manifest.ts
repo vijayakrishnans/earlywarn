@@ -219,5 +219,14 @@ export const manifest: MigrationManifest = {
       description:
         "Escalation alerts already delivered, keeping the scheduler idempotent",
     },
+    {
+      id: "240_desk_submissions",
+      context: "desk",
+      path: "240_desk_submissions/up.sql",
+      checksum:
+        "dce449f1f808035c9ab8c386f9eaaee5898d76e411e7ee8ed448d1936190a759",
+      description:
+        "Records of stages filed in ENISA's Single Reporting Platform",
+    },
   ],
 };

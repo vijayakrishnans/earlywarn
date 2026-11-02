@@ -232,6 +232,26 @@ function caseParams(c: DeskCase): unknown[] {
   ];
 }
 
+export type DeskStage = "early_warning" | "notification" | "final";
+
+export interface DeskSubmission {
+  stage: DeskStage;
+  fields: Record<string, string>;
+  srpReference: string | null;
+  submittedAt: string;
+  submittedBy: string;
+}
+
+function mapSubmission(row: Row): DeskSubmission {
+  return {
+    stage: String(row.stage) as DeskStage,
+    fields: JSON.parse(String(row.fields)) as Record<string, string>,
+    srpReference: nullable(row.srp_reference),
+    submittedAt: String(row.submitted_at),
+    submittedBy: String(row.submitted_by),
+  };
+}
+
 export type SlugWrite = { ok: true; settings: DeskSettings } | { ok: false; reason: "slug_taken" };
 
 /** Every statement scopes by org_id; nothing here reads across tenants. */
@@ -402,6 +422,25 @@ export function createDeskRepository(executor: SqlExecutor) {
         if (isUniqueViolation(err)) return false;
         throw err;
       }
+    },
+
+    async listSubmissions(orgId: string, caseId: string): Promise<DeskSubmission[]> {
+      const { rows } = await executor.execute<Row>(
+        `SELECT * FROM desk_submissions WHERE org_id = $1 AND case_id = $2 ORDER BY submitted_at, stage`,
+        [orgId, caseId],
+      );
+      return rows.map(mapSubmission);
+    },
+
+    /** False means this stage was already recorded. */
+    async insertSubmission(orgId: string, caseId: string, s: DeskSubmission, now: string): Promise<boolean> {
+      const { rowCount } = await executor.execute(
+        `INSERT INTO desk_submissions (id, org_id, case_id, stage, fields, srp_reference, submitted_at, submitted_by, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         ON CONFLICT (case_id, stage) DO NOTHING RETURNING id`,
+        [crypto.randomUUID(), orgId, caseId, s.stage, JSON.stringify(s.fields), s.srpReference, s.submittedAt, s.submittedBy, now],
+      );
+      return rowCount > 0;
     },
 
     /** Scheduler only: every open case on the platform, soonest deadline first. */

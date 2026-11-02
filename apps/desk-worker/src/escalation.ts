@@ -287,9 +287,8 @@ export async function runEscalationTick(env: Env, nowDate: Date): Promise<TickRe
   return result;
 }
 
-/** Filed stages arrive with the report packet in EW5; until then every stage stays owed. */
-async function submittedStages(_repo: DeskRepository, _c: DeskCase): Promise<ReadonlySet<ReportingStage>> {
-  return new Set();
+async function submittedStages(repo: DeskRepository, c: DeskCase): Promise<ReadonlySet<ReportingStage>> {
+  return new Set((await repo.listSubmissions(c.orgId, c.id)).map((s) => s.stage));
 }
 
 export async function sendTestAlert(
