@@ -68,6 +68,9 @@ export function buildNavSections(scope: NavScope, soloMode: boolean = SOLO_MODE)
             { href: `${orgBase}/settings`, label: "Settings", icon: "Settings", subPanel: true },
           ]
         : [
+            { href: `${orgBase}/desk`, label: "Readiness", icon: "CheckCircle2" },
+            { href: `${orgBase}/desk/products`, label: "Products", icon: "Package" },
+            { href: `${orgBase}/desk/escalation`, label: "Escalation", icon: "BellRing" },
             { href: `${orgBase}/projects`, label: "Projects", icon: "FolderKanban" },
             { href: `${orgBase}/usage`, label: "Usage & quota", icon: "Gauge" },
             // Opens the dedicated settings panel — flagged so the renderer shows a ›.

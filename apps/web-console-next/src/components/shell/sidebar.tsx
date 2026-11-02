@@ -4,6 +4,9 @@ import * as React from "react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import {
+  CheckCircle2,
+  Package,
+  BellRing,
   Building2,
   ChevronDown,
   ChevronLeft,
@@ -35,6 +38,9 @@ import { SidebarOrgSwitcher } from "./sidebar-org-switcher";
 import { SidebarFind } from "./sidebar-find";
 
 const ICONS: Record<string, LucideIcon> = {
+  CheckCircle2,
+  Package,
+  BellRing,
   Building2,
   FolderKanban,
   Boxes,

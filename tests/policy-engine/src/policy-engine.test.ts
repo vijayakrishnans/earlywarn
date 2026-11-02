@@ -686,7 +686,7 @@ describe("listEffectivePermissions", () => {
     expect(result.derivedScope.orgId).toBe("org_1");
 
     const allowed = result.permissions.filter((p) => p.allow);
-    expect(allowed.length).toBe(31);
+    expect(allowed.length).toBe(33);
   });
 
   it("returns limited permissions for viewer", () => {
@@ -698,6 +698,7 @@ describe("listEffectivePermissions", () => {
     const result = listEffectivePermissions(input);
     const allowed = result.permissions.filter((p) => p.allow);
     expect(allowed.map((p) => p.action).sort()).toEqual([
+      "desk.read",
       "organization.config.read",
       "organization.integration.read",
       "organization.metering.read",
@@ -1014,5 +1015,24 @@ describe("project.repo_link.write (saas-integrations IG3)", () => {
         authReq("project.repo_link.write", ORG, [projectFact("project_builder", ORG, "p1")], "p1"),
       ).allow,
     ).toBe(false);
+  });
+});
+
+describe("the reporting desk", () => {
+  it.each(["owner", "admin"] as const)("lets %s read and write", (role) => {
+    const facts = [orgFact(role, "org_1")];
+    expect(authorize(authReq("desk.read", "org_1", facts)).allow).toBe(true);
+    expect(authorize(authReq("desk.write", "org_1", facts)).allow).toBe(true);
+  });
+
+  it.each(["builder", "viewer"] as const)("lets %s read only", (role) => {
+    const facts = [orgFact(role, "org_1")];
+    expect(authorize(authReq("desk.read", "org_1", facts)).allow).toBe(true);
+    expect(authorize(authReq("desk.write", "org_1", facts)).allow).toBe(false);
+  });
+
+  it("keeps billing admins and other organizations out", () => {
+    expect(authorize(authReq("desk.read", "org_1", [orgFact("billing_admin", "org_1")])).allow).toBe(false);
+    expect(authorize(authReq("desk.read", "org_2", [orgFact("owner", "org_1")])).allow).toBe(false);
   });
 });

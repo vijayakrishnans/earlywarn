@@ -9,6 +9,10 @@
 export const qk = {
   orgs: () => ["orgs"] as const,
   profile: () => ["profile"] as const,
+  deskReadiness: (orgId: string) => ["deskReadiness", orgId] as const,
+  deskSettings: (orgId: string) => ["deskSettings", orgId] as const,
+  deskProducts: (orgId: string) => ["deskProducts", orgId] as const,
+  deskEscalation: (orgId: string) => ["deskEscalation", orgId] as const,
   projects: (orgId: string) => ["projects", orgId] as const,
   environments: (orgId: string, projectId: string) =>
     ["environments", orgId, projectId] as const,

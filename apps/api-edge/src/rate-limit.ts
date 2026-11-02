@@ -51,6 +51,7 @@ export type RouteFamily =
   | "auth"
   | "org"
   | "project"
+  | "desk"
   | "config"
   | "webhooks"
   | "metering"
@@ -89,6 +90,10 @@ const LIMITS: Record<RouteFamily, FamilyConfig> = {
     org: { limit: 300, windowSec: 60 },
   },
   project: {
+    identity: { limit: 60, windowSec: 60 },
+    org: { limit: 300, windowSec: 60 },
+  },
+  desk: {
     identity: { limit: 60, windowSec: 60 },
     org: { limit: 300, windowSec: 60 },
   },

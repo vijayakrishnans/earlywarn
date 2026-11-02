@@ -183,5 +183,14 @@ export const manifest: MigrationManifest = {
       description:
         "Connection pointer on the inbound-delivery inbox (nullable connection_id + partial index) — lets the per-connection delivery log scope precisely; attributed by the IG2 cron drain",
     },
+    {
+      id: "200_desk_register",
+      context: "desk",
+      path: "200_desk_register/up.sql",
+      checksum:
+        "1a499339209a2e802a5e2de39066b66ccd5265207eb7b939fb42a17ebdaa303f",
+      description:
+        "Reporting desk register — products, desk settings, escalation chain",
+    },
   ],
 };

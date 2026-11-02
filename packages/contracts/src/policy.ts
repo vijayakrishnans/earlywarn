@@ -100,6 +100,8 @@ export const ORGANIZATION_ACTIONS = [
   "organization.api_key.create",
   "organization.api_key.list",
   "organization.api_key.revoke",
+  "desk.read",
+  "desk.write",
   "project.create",
   "project.list",
   "project.read",

@@ -16,6 +16,8 @@ import { POLICY_VERSION } from "@saas/contracts/policy";
 
 const ORG_ROLE_PERMISSIONS: Record<OrganizationRole, readonly string[]> = {
   owner: [
+    "desk.read",
+    "desk.write",
     "organization.read",
     "organization.settings.update",
     "organization.invitation.create",
@@ -59,6 +61,8 @@ const ORG_ROLE_PERMISSIONS: Record<OrganizationRole, readonly string[]> = {
     "project.repo_link.write",
   ],
   admin: [
+    "desk.read",
+    "desk.write",
     "organization.read",
     "organization.settings.update",
     "organization.invitation.create",
@@ -100,6 +104,7 @@ const ORG_ROLE_PERMISSIONS: Record<OrganizationRole, readonly string[]> = {
     "project.repo_link.write",
   ],
   builder: [
+    "desk.read",
     "organization.read",
     "project.create",
     "project.list",
@@ -116,6 +121,7 @@ const ORG_ROLE_PERMISSIONS: Record<OrganizationRole, readonly string[]> = {
     "organization.integration.read",
   ],
   viewer: [
+    "desk.read",
     "organization.read",
     "project.list",
     "project.read",
@@ -206,6 +212,8 @@ const PROJECT_GRANTABLE_ACTIONS: ReadonlySet<string> = new Set([
 ]);
 
 const ALL_KNOWN_ACTIONS: ReadonlySet<string> = new Set([
+  "desk.read",
+  "desk.write",
   "organization.read",
   "organization.settings.update",
   "organization.invitation.create",
